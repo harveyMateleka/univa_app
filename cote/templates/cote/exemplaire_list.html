@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="container-fluid pt-4 px-4">
+                <div class="row vh-50 bg-secondary rounded align-items-center justify-content-center mx-0">
+                   <div class="col-sm-12 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4">Exemplaire</h6>
+
+                            <div class="bg-secondary rounded h-100 p-4">
+<!-- Progress bar -->
+
+                            <nav>
+                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Configuration</button>
+                                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Condition</button>
+                                </div>
+                            </nav>
+                            <div class="tab-content pt-3" id="nav-tabContent">
+                                <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                                     <form>
+
+
+                                <div class="mb-3">
+
+                                    <div class="row">
+                                    <div class="col-sm-2">
+                                    <label class="form-label">Date Op.</label>
+                                    <input type="date" class="form-control" value="{% now 'Y-m-d' %}" id="dateop" name="dateop">
+
+                                    </div>
+                                    <div class="col-sm-2">
+                                    <label class="form-label">Annee Academique</label>
+                                    <select class="form-control select" id="annee" name="annee">
+                                        {% for foo in annee %}
+                                        <option value="{{ foo.id }}">{{ foo.libelle }}</option>
+                                        {% endfor %}
+
+
+                                    </select>
+
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <label for="exampleInputEmail1" class="form-label">Departement</label>
+                                        <select onchange="getsections(this)" class="form-control select" id="departement" name="departement">
+                                            {% for foo in departement %}
+                                            <option value="{{ foo.id }}">{{ foo.libelle }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <label for="exampleInputEmail1" class="form-label">Sections</label>
+                                        <select onchange="getoptions(this)" class="form-control select" id="section" name="section">
+
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label for="exampleInputEmail1" class="form-label">Options</label>
+                                        <select onchange="getpromotion(this)"  class="form-control select" id="option" name="option">
+
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label for="exampleInputEmail1" class="form-label">Promotion</label>
+                                        <select class="form-control select" id="promotion" name="promotion">
+
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="exampleInputEmail1" class="form-label">Cours</label>
+                                        <select class="form-control select" id="cours" name="cours">
+{#                                            {% for foo in cours %}#}
+{#                                            <option value="{{ foo.id }}" data-cours="{{ foo.sigle }}">{{ foo.libelle }}</option>#}
+{#                                            {% endfor %}#}
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label for="exampleInputEmail1" class="form-label">Epreuve</label>
+                                        <select class="form-control select" id="epreuve" name="epreuve">
+                                             <option value="1">Mi-Session</option>
+                                            <option value="2">1ere Session</option>
+                                            <option value="3">2eme Session</option>
+                                            <option value="6">Session Special</option>
+                                            <option value="4">Interro</option>
+                                            <option value="5">Tp</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <label for="exampleInputEmail1" class="form-label">N° Epr.</label>
+                                        <input type="number" class="form-control" value="1" name="numero" id="numero">
+
+                                    </div>
+
+                                    </div>
+                                    &nbsp;
+                                    <div class="row">
+                                    <div class="col-sm-6">
+                                    <button  type="button" id="btnaff" class="btn btn-primary">Afficher</button>
+                                    <button type="button" id="btnex" class="btn btn-success"><span id="btngenerer"></span> Générer</button>
+                                    <button type="button" id="btnimp" class="btn btn-warning"><span id="btnimpression"></span> Imprimer</button>
+
+                                    </div>
+
+                                    </div>
+
+                                </div>
+
+
+                            </form>
+                                </div>
+                                <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                                    <form>
+                                    <div class="mb-3">
+                                    <div class="row">
+                                    <div class="col-sm-2">
+                                    <label class="form-label">Anonymat</label>
+                                    <select class="form-control" id="anonymat" name="anonymat">
+                                        <option value="0">Non</option>
+                                        <option value="1">Oui</option>
+                                    </select>
+                                    </div>
+                                     <div class="col-sm-2">
+                                    <label class="form-label">Choix Multiple</label>
+                                    <select class="form-control" id="choix" name="choix">
+                                        <option value="0">Non</option>
+                                        <option value="2">Oui</option>
+                                    </select>
+                                    </div>
+
+                                    </div>
+                                        </div>
+                                     </form>
+                                </div>
+                            </div>
+                        </div>
+
+                            <div class="accordion" id="accordionExample">
+                                <div class="accordion-item bg-transparent">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            Liste des Etudiants
+
+                                        </button>
+
+
+
+                                    </h2>
+
+
+                                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                                        <div class="accordion-body">
+
+                                            <div class="table-responsive">
+                                                <table id="example" class="table table-hover dataTable table-striped table_custom border-style spacing5">
+                                                    <thead>
+                                                        <tr>
+                                                        <th>#</th>
+                                                        <th>Nom</th>
+                                                        <th>Postnom</th>
+                                                        <th>Prenom</th>
+                                                        <th>Sexe</th>
+                                                        <th>Telephone</th>
+
+                                                        <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tbody" style="color: white">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+ </div>
+
+{% endblock %}
+
+
+ {% block script %}
+
+    <script>
+
+
+$(document).ready(function() {
+
+     $('.select').select2();
+     $('#example').DataTable({
+            language: {
+                url: "{% static 'css/fr_fr.json' %}"
+            }
+        });
+        $('#departement').change();
+        $('#btnaff').on('click', function()
+                    {
+
+afficher();
+
+
+                    });
+
+
+
+
+
+        $('#btnex').on('click', function()
+                    {
+generer()
+
+
+
+                    });
+        $('#btnimp').on('click', function()
+                    {
+impressionfull()
+
+
+
+                    });
+
+        $('#promotion').on('change', function()
+                    {
+ courspro1();
+
+                    });
+        
+        setTimeout(function() {
+        $('#promotion').change();
+    }, 2000);
+
+
+
+
+
+});
+
+function impression(id){
+
+     window.open('{{ MEDIA_URL }}'+id)
+}
+ function courspro1()
+    {
+
+         $.ajax({
+                url: "{% url 'cote:exemplaire' %}",
+                method: "get",
+                data: {
+                    'annee':$('#annee').val(),
+                    'courspro':'',
+                    "promotion":$('#promotion').val()
+                },
+                dataType: "json",
+                success: function(data){
+
+                    $('#cours').children().remove();
+
+
+                     $.each(data.data,function(key,value){
+                                          var item=$('<option>',{
+                                              value:value.cours_id,
+
+                                              text:value.cours__libelle
+                                          })
+                                          item.attr('data-cours', value.cours__sigle);
+                                         $('#cours').append(item);
+
+                             });
+
+                     afficher();
+
+                },
+                        error: function(request, status, err) {
+
+
+                        }
+            });
+
+    }
+function afficher() {
+
+
+         try{
+
+
+    var oTABLE=$('#example').DataTable({
+    "bProcessing":true,
+        language: {
+                url: "{% static 'css/fr_fr.json' %}"
+            },
+        ajax: {
+            url: '{% url 'cote:exemplaire' %}',
+            type: 'get',
+            data: {
+                    'numero':$('#numero').val(),
+                    'cours':$('#cours').val(),
+                    'epreuve':$('#epreuve').val(),
+                    'annee':$('#annee').val(),
+                    "promotion":$('#promotion').val()
+                }
+                }
+        ,
+    "columns":[
+
+    {"data":'matricule_id',"autoWidth":true,"render":function (data){
+            return data ;
+
+        }},
+    {"data":'matricule__nom'},
+    {"data":'matricule__postnom'},
+    {"data":'matricule__prenom'},
+    {"data":'matricule__sexe'},
+    {"data":'matricule__telephone'},
+    {"data":'cours_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return '{% if perms.parametrage.view_etudiants %}<button onclick=impression("'+ row.lien+new String(row.matricule__matricule).replace(/[^0-9.]/gi, "")+'.pdf") title="voir"><i class="fa fa-eye" style="color: green"></i></button>{% endif %}' ;
+
+        }}
+    ],
+
+    "bDestroy":true
+    });
+    }catch(e){
+      // alert(e)
+    }
+
+    }
+
+function generer(){
+
+
+                $('#btngenerer').attr('class','spinner-border spinner-border-sm mr-2');
+
+
+                $.ajax({
+                         url: '{% url 'cote:exemplaire' %}',
+                        type: 'post',
+                            data: {
+                             'promotion':$('#promotion').val(),
+                             'promotionlib':$('#promotion option:selected').text(),
+                            "annee":$('#annee').val(),
+                            "numero":$('#numero').val(),
+                            "anonymat":$('#anonymat').val(),
+                            "anneelib":$('#annee option:selected').text(),
+                            "cours":$('#cours').val(),
+                            "courslib":$('#cours option:selected').data('cours'),
+                            "csrfmiddlewaretoken": '{{ csrf_token }}',
+                            "epreuve":$('#epreuve').val(),
+                            "epreuvelib":$('#epreuve option:selected').text()
+                        },
+                        async:true,
+                        success: function(d){
+                              $('#btngenerer').attr('class','');
+                           if(d=="true"){
+                               $.toast({
+                                    heading: 'Information',
+                                    text: 'La génération avec success.',
+                                    icon: 'success',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                })
+                               afficher();
+                             }
+
+                        },
+                        error: function(request, status, err) {
+                              $('#btngenerer').attr('class','');
+                               $.toast({
+                                    heading: 'Erreur',
+                                    text: request + status + err,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                        }
+                        });
+
+
+                    }
+function impressionfull(){
+
+                 var table = $('#example tbody');
+                if ( table.children().length == 0) {
+                     $.toast({
+                                    heading: 'Erreur',
+                                    text: "Tableau Vide.",
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                    return false;
+                }
+
+                $('#btnimpression').attr('class','spinner-border spinner-border-sm mr-2');
+
+
+                $.ajax({
+                         url: '{% url 'cote:exemplaire' %}',
+                         type: 'post',
+                         data: {
+                             'impression':"1",
+                            "annee":$('#annee').val(),
+                            "numero":$('#numero').val(),
+                            "promotion":$('#promotion').val(),
+                            "cours":$('#cours').val(),
+                            "csrfmiddlewaretoken": '{{ csrf_token }}',
+                            "epreuve":$('#epreuve').val()
+                        },
+                        async:true,
+                        success: function(d){
+                              $('#btnimpression').attr('class','');
+                           if(d=="true"){
+                               $.toast({
+                                    heading: 'Information',
+                                    text: 'Operation avec success.',
+                                    icon: 'success',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                })
+                               //afficher();
+                             }
+
+                        },
+                        error: function(request, status, err) {
+                              $('#btnimpression').attr('class','');
+                               $.toast({
+                                    heading: 'Erreur',
+                                    text: request + status + err,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                        }
+                        });
+
+
+                    }
+
+
+
+
+    </script>
+{% endblock %}

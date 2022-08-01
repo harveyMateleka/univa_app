@@ -1,0 +1,519 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+    <style type="text/css">
+
+
+body {
+    padding-bottom: 2rem;
+    padding-top: 4rem;
+}
+.row {
+    margin-bottom: 1rem;
+}
+[class*="col-"] {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+hr {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+#files {
+    overflow-y: scroll !important;
+    min-height: 320px;
+}
+@media (min-width: 768px) {
+    #files {
+        min-height: 0;
+    }
+}
+#debug {
+    overflow-y: scroll !important;
+    height: 180px;
+}
+
+.dm-uploader {
+    border: 0.25rem dashed #A5A5C7;
+    text-align: center;
+}
+.dm-uploader.active {
+    border-color: red;
+
+    border-style: solid;
+}
+
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="container-fluid pt-4 px-4">
+                <div class="row vh-50 bg-secondary rounded mx-0">
+                    <div class="col-sm-12 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4">Charger les Fichiers</h6>
+                            <form method="post" >
+                            {% csrf_token %}
+
+                                         <div class="row mb-3">
+
+                                    <div class="col-sm-2">
+                                    <label class="form-label">Annee Academique</label>
+                                    <select class="form-control select" id="annee" name="annee">
+                                        {% for foo in annee %}
+                                        <option value="{{ foo.id }}">{{ foo.libelle }}</option>
+                                        {% endfor %}
+
+
+                                    </select>
+
+                                    </div>
+
+                                    <div class="col-sm-2">
+                                        <label for="exampleInputEmail1" class="form-label">Promotion</label>
+                                        <select class="form-control select" id="promotion" name="promotion">
+                                            {% for foo in promotion %}
+                                            <option value="{{ foo.id }}">{{ foo.libelle }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <label for="exampleInputEmail1" class="form-label">Cours</label>
+                                        <select class="form-control select" id="cours" name="cours">
+{#                                            {% for foo in cours %}#}
+{#                                            <option value="{{ foo.id }}" data-cours="{{ foo.sigle }}">{{ foo.libelle }}</option>#}
+{#                                            {% endfor %}#}
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <label for="exampleInputEmail1" class="form-label">Epreuve</label>
+                                        <select class="form-control select" id="epreuve" name="epreuve">
+                                             <option value="1">Mi-Session</option>
+                                            <option value="2">1ere Session</option>
+                                            <option value="3">2eme Session</option>
+                                            <option value="4">Interro</option>
+                                            <option value="5">Tp</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <label for="exampleInputEmail1" class="form-label">N° Epr.</label>
+                                        <input type="number" class="form-control" value="1" name="numero" id="numero">
+
+                                    </div>
+                                </div>
+                            <div class="row">
+
+
+
+                                        <div class="col-md-6 col-sm-12">
+                                          <!-- Our markup, the important part here! -->
+                                          <div id="drag-and-drop-zone" class="dm-uploader p-5">
+                                            <h3 class="mb-5 mt-5 text-muted">Charger les fichier ici</h3>
+
+                                            <div class="btn btn-primary btn-block mb-5">
+                                                <span>Charger ici</span>
+                                                <input type="file" title='Clicker pour charger les fichiers' />
+                                            </div>
+                                          </div>
+
+                                        </div>
+                                        <div class="col-md-6 col-sm-12">
+                                          <div class="card h-100">
+                                            <div class="card-header">
+                                              Fichier
+                                            </div>
+
+                                            <ul class="list-unstyled p-2 d-flex flex-column col" id="files">
+                                              <li class="text-muted text-center empty">Aucun fichier.</li>
+                                            </ul>
+                                          </div>
+                                        </div>
+
+
+
+                                </div>
+
+                                <div class="col-sm-12">
+                                <button type="button" onclick="corriger();" class="btn btn-primary" ><span id="btncorriger"></span> Transmission </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+ </div>
+
+{% endblock %}
+
+
+ {% block script %}
+
+    <script>
+
+//------------------------------------------------------------------------------
+  function ui_add_log(message, color)
+{
+  var d = new Date();
+
+  var dateString = (('0' + d.getHours())).slice(-2) + ':' +
+    (('0' + d.getMinutes())).slice(-2) + ':' +
+    (('0' + d.getSeconds())).slice(-2);
+
+  color = (typeof color === 'undefined' ? 'muted' : color);
+
+  var template = $('#debug-template').text();
+  template = template.replace('%%date%%', dateString);
+  template = template.replace('%%message%%', message);
+  template = template.replace('%%color%%', color);
+
+  $('#debug').find('li.empty').fadeOut(); // remove the 'no messages yet'
+  $('#debug').prepend(template);
+}
+
+// Creates a new file and add it to our list
+function ui_multi_add_file(id, file)
+{
+  var template = $('#files-template').text();
+  template = template.replace('%%filename%%', file.name);
+  template = template.replace('%%filenamee%%', file.name);
+  template = template.replace('%%filenameid%%', id);
+
+
+
+  template = $(template);
+  template.prop('id', 'uploaderFile' + id);
+  template.data('file-id', id);
+
+  $('#files').find('li.empty').fadeOut(); // remove the 'no files yet'
+
+
+  $('#files').prepend(template);
+}
+
+
+function deleteAdd(id)
+{
+
+    $.ajax({
+                         url:  "{% url 'cote:deletefile' %}",
+                         data: {
+                             "id":$('#refint').val()+'_'+id.attr('data-idname'),
+                              csrfmiddlewaretoken: '{{ csrf_token }}'
+                         },
+                         type: 'POST',
+                         success: function (data) {
+
+                            $("#uploaderFile" + id.attr('data-idx')).remove();
+                          },
+                              error: function (data) {
+
+                              }
+                         });
+
+}
+
+
+function corriger()
+{
+$('#btncorriger').attr('class','spinner-border spinner-border-sm mr-2');
+    $.ajax({
+                         url:  "{% url 'cote:corriger' %}",
+                         data: {
+                             'promotion':$('#promotion').val(),
+                             'promotionlib':$('#promotion option:selected').text(),
+                            "annee":$('#annee').val(),
+                            "numero":$('#numero').val(),
+                            "anneelib":$('#annee option:selected').text(),
+                            "cours":$('#cours').val(),
+                            "courslib":$('#cours option:selected').data('cours'),
+                            "csrfmiddlewaretoken": '{{ csrf_token }}',
+                            "epreuve":$('#epreuve').val(),
+                            "epreuvelib":$('#epreuve option:selected').text()
+                         },
+                         type: 'POST',
+                         success: function (data) {
+                                $('#btncorriger').attr('class','');
+                                $.toast({
+                                    heading: 'Information',
+                                    text: "Opération effectuee",
+                                    icon: 'success',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                })
+                            $("#uploaderFile" + id.attr('data-idx')).remove();
+
+
+                          },
+                              error: function (request, status, err) {
+                                     $('#btncorriger').attr('class','');
+                                     $.toast({
+                                    heading: 'Erreur',
+                                    text: request + status + err,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                              }
+                         });
+
+}
+
+// Changes the status messages on our list
+function ui_multi_update_file_status(id, status, message)
+{
+  $('#uploaderFile' + id).find('span').html(message).prop('class', 'status text-' + status);
+}
+
+// Updates a file progress, depending on the parameters it may animate it or change the color.
+function ui_multi_update_file_progress(id, percent, color, active)
+{
+  color = (typeof color === 'undefined' ? false : color);
+  active = (typeof active === 'undefined' ? true : active);
+
+  var bar = $('#uploaderFile' + id).find('div.progress-bar');
+
+  bar.width(percent + '%').attr('aria-valuenow', percent);
+  bar.toggleClass('progress-bar-striped progress-bar-animated', active);
+
+  if (percent === 0){
+    bar.html('');
+  } else {
+    bar.html(percent + '%');
+  }
+
+  if (color !== false){
+    bar.removeClass('bg-success bg-info bg-warning bg-danger');
+    bar.addClass('bg-' + color);
+  }
+}
+//-----------------------------------------------------------------------------------------------------------
+
+ $('#drag-and-drop-zone').dmUploader({ //
+    method:'POST',
+     extraData: {
+        'promotion':$('#promotion').val(),
+         'promotionlib':$('#promotion option:selected').text(),
+        "annee":$('#annee').val(),
+        "numero":$('#numero').val(),
+        "anneelib":$('#annee option:selected').text(),
+        "cours":$('#cours').val(),
+        "courslib":$('#cours option:selected').data('cours'),
+        "csrfmiddlewaretoken": '{{ csrf_token }}',
+        "epreuve":$('#epreuve').val(),
+        "epreuvelib":$('#epreuve option:selected').text()
+     },
+
+    //allowedTypes:".jpeg,.jpg,.png,.gif,.pdf,*.mp4",
+    extFilter: ["jpg", "jpeg", "png", "gif"],
+    maxFiles: 1,
+    timeout: 180000,
+    url: "{% url 'cote:addfile' %}?id="+$('#refint').val(),
+
+
+    maxFileSize: 20000000, // 20 Megs
+    onDragEnter: function(){
+      // Happens when dragging something over the DnD area
+      this.addClass('active');
+    },
+    onDragLeave: function(){
+      // Happens when dragging something OUT of the DnD area
+      this.removeClass('active');
+    },
+    onInit: function(){
+      // Plugin is ready to use
+      ui_add_log('Penguin initialized :)', 'info');
+    },
+    onComplete: function(){
+      // All files in the queue are processed (success or error)
+      ui_add_log('All pending tranfers finished');
+    },
+    onNewFile: function(id, file){
+      // When a new file is added using the file selector or the DnD area
+      ui_add_log('New file added #' + id);
+      ui_multi_add_file(id, file);
+    },
+    onBeforeUpload: function(id){
+      // about tho start uploading a file
+      ui_add_log('Starting the upload of #' + id);
+      ui_multi_update_file_status(id, 'uploading', 'Uploading...');
+      ui_multi_update_file_progress(id, 0, '', true);
+    },
+    onUploadCanceled: function(id) {
+      // Happens when a file is directly canceled by the user.
+      ui_multi_update_file_status(id, 'warning', 'Canceled by User');
+      ui_multi_update_file_progress(id, 0, 'warning', false);
+    },
+    onUploadProgress: function(id, percent){
+      // Updating file progress
+      ui_multi_update_file_progress(id, percent);
+    },
+    onUploadSuccess: function(id, data){
+      // A file was successfully uploaded
+      ui_add_log('Server Response for file #' + id + ': ' + JSON.stringify(data));
+      ui_add_log('Upload of file #' + id + ' COMPLETED', 'success');
+      ui_multi_update_file_status(id, 'success', 'Upload Complete');
+      ui_multi_update_file_progress(id, 100, 'success', false);
+
+    },
+    onUploadError: function(id, xhr, status, message){
+      ui_multi_update_file_status(id, 'danger', message);
+      ui_multi_update_file_progress(id, 0, 'danger', false);
+    },
+    onFallbackMode: function(){
+      // When the browser doesn't support this plugin :(
+      ui_add_log('Plugin cant be used here, running Fallback callback', 'danger');
+    },
+    onFileSizeError: function(file){
+      ui_add_log('File \'' + file.name + '\' cannot be added: size excess limit', 'danger');
+    }
+  });
+
+//-----------------------------------------------------------------------------------------------------------
+function courspro1()
+    {
+
+         $.ajax({
+                url: "{% url 'cote:exemplaire' %}",
+                method: "get",
+                data: {
+                    'annee':$('#annee').val(),
+                    'courspro':'',
+                    "promotion":$('#promotion').val()
+                },
+                dataType: "json",
+                success: function(data){
+
+                    $('#cours').children().remove();
+
+
+                     $.each(data.data,function(key,value){
+
+                                         $('#cours').append($('<option>',{
+                                              value:value.cours_id,
+                                              text:value.cours__libelle
+                                          }));
+
+                             });
+
+                     afficher();
+
+                },
+                        error: function(request, status, err) {
+
+
+                        }
+            });
+
+    }
+$(document).ready(function() {
+
+     $('.select').select2();
+     $('.js-basic-example').DataTable({
+            language: {
+                url: "{% static 'css/fr_fr.json' %}"
+            }
+        });
+      $('#promotion').on('change', function()
+                    {
+ courspro1();
+
+                    });
+        $('#promotion').change();
+        courspro1();
+
+
+
+ {#    $(document).ready(function() {#}
+ {#       $('#btnaff').on('click', function()#}
+ {#                   {#}
+ {#output = "";#}
+ {#                        $.ajax({#}
+ {#               url: "{% url 'paiement:historiquepaiefrais_rapport' %}",#}
+ {#               method: "get",#}
+ {#               data: {'dtd':$('#dtd').val(),#}
+ {#                   "dtf":$('#dtf').val()#}
+ {#               },#}
+ {#               dataType: "json",#}
+ {#               success: function(data){#}
+ {#                   x = data.data;#}
+ {#                   for (i = 0; i < x.length; i++){#}
+ {#                       output +=#}
+ {#                       "<tr><td>" + x[i].id +#}
+ {#                       "</td><td>" + x[i].etudiantid__nom +#}
+ {#                       "</td><td>" + x[i].fraisid__libelle +#}
+ {#                       "</td><td>" + x[i].montantpayer +#}
+ {#                       "</td><td>" + x[i].datepaiement +#}
+ {#                       "</td><td>" + x[i].anneeid__libelle +#}
+ {#                       "</td><td>" + x[i].modepaieid__libelle +#}
+ {#                       "</td></tr>"#}
+ {#                   }#}
+ {#                   $("#tbody").html(output);#}
+ {#               }#}
+ {#           });#}
+ {##}
+ {##}
+ {##}
+ {#                   });#}
+ {#       });#}
+ {##}
+ {#     function impresson(){#}
+ {##}
+ {##}
+ {#               $('#btnimprimer').attr('class','spinner-border spinner-border-sm mr-2');#}
+ {#               var cmp=0;#}
+ {##}
+ {#               $.ajax({#}
+ {#                        url: '{% url 'paiement:paiefrais_rapport' %}',#}
+ {#                       type: 'get',#}
+ {#                       async:true,#}
+ {#                       success: function(d){#}
+ {#                          if(d=="true"){#}
+ {#                           $('#btnimprimer').attr('class','');#}
+ {#                            window.open('{{ MEDIA_URL }}paiefrais.pdf');#}
+ {#                            }#}
+ {##}
+ {#                       },#}
+ {#                       error: function(request, status, err) {#}
+ {#                           $('#btnimprimer').attr('class','');#}
+ {#                           alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);#}
+ {#                       }#}
+ {#                       });#}
+ {##}
+ {##}
+ {#                   }#}
+
+});
+
+
+
+
+
+
+    </script>
+
+ <script type="text/html" id="files-template">
+     <li class="media">
+        <div class="media-body mb-1">
+          <p class="mb-2">
+            <strong id="nomx"  data-idx="%%filenameid%%" data-idname="%%filenamee%%">%%filename%%</strong> - Status: <span class="text-muted">Waiting</span>
+
+          </p>
+          <div class="progress mb-2">
+            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+              role="progressbar"
+              style="width: 0%"
+              aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            </div>
+          </div>
+          <a onclick=deleteAdd($('#nomx'))>Supprimer</a>
+          <hr class="mt-1 mb-1" />
+        </div>
+      </li>
+    </script>
+ <script type="text/html" id="debug-template">
+      <li class="list-group-item text-%%color%%"><strong>%%date%%</strong>: %%message%%</li>
+    </script>
+{% endblock %}

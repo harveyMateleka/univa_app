@@ -1,0 +1,581 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="container-fluid pt-4 px-4">
+                <div class="row vh-50 bg-secondary rounded align-items-center justify-content-center mx-0">
+                   <div class="col-sm-12 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4">Cote</h6>
+
+                            <div class="bg-secondary rounded h-100 p-4">
+                             <nav>
+                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Saisie Simple</button>
+                                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Saisie Composée</button>
+{#                                    <button class="nav-link" id="nav-etudiant-tab" data-bs-toggle="tab" data-bs-target="#nav-etudiant" type="button" role="tab" aria-controls="nav-etudiant" aria-selected="false">Saisie par Etudiant</button>#}
+                                </div>
+                            </nav>
+
+
+                                <div class="tab-content pt-3" id="nav-tabContent">
+                                <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                                    {% include 'cote/saisiesimple.html' %}
+                                </div>
+                                <div class="tab-panes fade"  id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                                    {% include 'cote/saisiecompose.html' %}
+                                </div>
+{#                                 <div class="tab-panee fade" id="nav-etudiant" role="tabpanel" aria-labelledby="nav-etudiant-tab">#}
+{##}
+{#                                    {% include 'cote/saisieetudiant.html' %}#}
+{#                                </div>#}
+                               </div>
+
+                        </div>
+
+
+                        </div>
+                    </div>
+                </div>
+ </div>
+
+{% endblock %}
+
+
+ {% block script %}
+
+    <script>
+
+
+$(document).ready(function() {
+
+     $('.select').select2();
+
+
+
+
+$('body').on('change', '.edit_detect', function(event){
+            var ids = $(this).data('matricule');
+            var vl = $(this).val();
+            var valo = $(this);
+         $.ajax({
+                url: "{% url 'cote:cote' %}",
+                method: "post",
+                data: {
+                    "matricule": ids,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "cote": vl,
+                    'numero':$('#numero').val(),
+                    'cours':$('#cours').val(),
+                    'epreuve':$('#epreuve').val(),
+                    'annee':$('#annee').val(),
+                    "promotion":$('#promotion').val()
+                },
+                dataType: "json",
+                success: function(data){
+
+                    if(data.id=='1'){
+                        $.toast({
+                                    heading: 'Information',
+                                    text: data.msg,
+                                    icon: 'success',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                })
+                          valo.css('background', '#F5CE42FF');
+                    }else{
+                          $.toast({
+                                    heading: 'Erreur',
+                                    text: data.msg,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                    }
+
+
+                },
+                        error: function(request, status, err) {
+
+                               $.toast({
+                                    heading: 'Erreur',
+                                    text: request + status + err,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                        }
+            });
+
+    });
+$('body').on('change', '.edit_detect1', function(event){
+            var ids = $(this).data('matricule');
+            var session = $(this).data('session');
+            var vl = $(this).val();
+            var valo = $(this);
+         $.ajax({
+                url: "{% url 'cote:cote' %}",
+                method: "post",
+                data: {
+                    "matricule": ids,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "cote": vl,
+                    'numero':$('#numero2').val(),
+                    'cours':$('#etudiant_cours').val(),
+                    'epreuve':session,
+                    'annee':$('#annee2').val(),
+                    "promotion":$('#promotion2').val()
+                },
+                dataType: "json",
+                success: function(data){
+
+                    if(data.id=='1'){
+                        $.toast({
+                                    heading: 'Information',
+                                    text: data.msg,
+                                    icon: 'success',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                })
+                          valo.css('background', '#F5CE42FF');
+                    }else{
+                          $.toast({
+                                    heading: 'Erreur',
+                                    text: data.msg,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                    }
+
+
+                },
+                        error: function(request, status, err) {
+
+                               $.toast({
+                                    heading: 'Erreur',
+                                    text: request + status + err,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                        }
+            });
+
+    });
+$('body').on('change', '.edit_detect2', function(event){
+            var ids = $(this).data('cours');
+            var session = $(this).data('session');
+            var vl = $(this).val();
+            var valo = $(this);
+         $.ajax({
+                url: "{% url 'cote:cote' %}",
+                method: "post",
+                data: {
+                    "matricule": $('#etudiant_cours').val(),
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "cote": vl,
+                    'numero':$('#numero2').val(),
+                    'cours':ids,
+                    'epreuve':session,
+                    'annee':$('#annee2').val(),
+                    "promotion":$('#promotion2').val()
+                },
+                dataType: "json",
+                success: function(data){
+
+                    if(data.id=='1'){
+                        $.toast({
+                                    heading: 'Information',
+                                    text: data.msg,
+                                    icon: 'success',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                })
+                          valo.css('background', '#F5CE42FF');
+                    }else{
+                          $.toast({
+                                    heading: 'Erreur',
+                                    text: data.msg,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                    }
+
+
+                },
+                        error: function(request, status, err) {
+
+                               $.toast({
+                                    heading: 'Erreur',
+                                    text: request + status + err,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                        }
+            });
+
+    });
+
+$('#promotion').on('change', function()
+                    {
+ courspro1();
+
+                    });
+$('#promotion2').on('change', function()
+                    {
+                         courspro2();
+
+                    });
+$('#promotion').change();
+//$('#promotion2').change();
+
+afficher2();
+
+        $('#btnaff').on('click', function()
+                    {
+
+afficher();
+
+
+                    });
+                $('#btnaff2').on('click', function()
+                    {
+ if($('#categorie').val()=="1")
+                     {
+
+ afficher2();
+                     }
+                     else
+                     {
+
+                    afficher3();
+                     }
+
+
+                    });
+
+
+
+
+
+                 $('#categorie').on('change', function()
+                    {
+                          courspro2();
+
+                    });
+
+                 $('#categorie').change();
+
+                 $('#etudiant_cours,#promotion2,#numero2,#annee2').on('change', function()
+                    {
+ if($('#categorie').val()=="1")
+                     {
+
+ afficher2();
+                     }
+                     else
+                     {
+
+                    afficher3();
+                     }
+
+
+                    });
+
+
+
+
+});
+
+function impression(id){
+     window.open('{{ MEDIA_URL }}'+id)
+}
+
+ function afficher()
+    {
+        var cc=$('#cours').val();
+        if($('#cours').children().length==0)
+            cc=0
+
+    try{
+
+    var oTABLE=$('#example').DataTable({
+    "bProcessing":true,
+        language: {
+                url: "{% static 'css/fr_fr.json' %}"
+            },
+        ajax: {
+            url: '{% url 'cote:cote' %}',
+            type: 'get',
+            data: {
+                    'numero':$('#numero').val(),
+                    'cours':cc,
+                    'epreuve':$('#epreuve').val(),
+                    'annee':$('#annee').val(),
+                    'simple':"",
+                    "promotion":$('#promotion').val()
+                }
+        },
+    "columns":[
+
+    {"data":'matricule_id',"autoWidth":true,"render":function (data){
+            return data ;
+
+        }},
+    {"data":'matricule__nom'},
+
+    {"data":'matricule__postnom'},
+    {"data":'matricule__prenom'},
+    {"data":'matricule_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.add_cote or perms.cote.change_cote %}<input type='text' name='note' id='note' data-matricule="+ row.matricule_id +" value='"+ row.cote +"' class='form-control edit_detect'>{% else %}"+ row.cote +"{% endif %}" ;
+
+        }},
+    {"data":'matricule_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.view_cote %}<button onclick=impression('"+ row.lien+row.matricule__matricule+".jpg') title='voir'><i class='fa fa-eye' style='color: green'></i></button>{% endif %}{% if perms.cote.change_cote %}<button onclick=impression('"+ row.lien+row.matricule__matricule+".pdf') title='modifier'><i class='fa fa-edit' style='color: #A5A5C7'></i></button>{% endif %}{% if perms.cote.delete_cote %}<button onclick=impression('"+ row.lien+row.matricule__matricule+".pdf') title='supprimer'><i class='fa fa-trash' style='color: red'></i></button>{% endif %}" ;
+
+        }}
+
+
+    ],
+
+    "bDestroy":true
+    });
+    }catch(e){
+       //alert(e)
+    }
+    }
+
+
+ function afficher2()
+    {
+        var cc=$('#etudiant_cours').val();
+        if($('#etudiant_cours').children().length==0)
+            cc=0
+
+    try{
+    var oTABLE=$('#example2').DataTable({
+    "bProcessing":true,
+        language: {
+                url: "{% static 'css/fr_fr.json' %}"
+            },
+        ajax: {
+            url: '{% url 'cote:cote' %}',
+            type: 'get',
+            data: {
+                    'numero':$('#numero2').val(),
+                    'cours':cc,
+                    'annee':$('#annee2').val(),
+                    'compose':"",
+                    "promotion":$('#promotion2').val()
+                }
+        },
+    "columns":[
+
+    {"data":'matricule_id',"autoWidth":true,"render":function (data){
+            return data ;
+
+        }},
+    {"data":'matricule__nom',"autoWidth":true,"render":function (data, type, row, meta){
+            return  row.matricule__nom+" "+row.matricule__postnom+" "+row.matricule__prenom ;
+
+        }},
+    {"data":'matricule_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.add_cote or perms.cote.change_cote %}<input type='text' name='note1' id='note1' data-matricule="+ row.matricule_id +" data-session='1' value='"+ row.cote1 +"' class='form-control edit_detect1'>{% else %}"+ row.cote1 +"{% endif %}" ;
+
+        }},
+    {"data":'matricule_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.add_cote or perms.cote.change_cote %}<input type='text' name='note2' id='note2' data-matricule="+ row.matricule_id +" data-session='2' value='"+ row.cote2 +"' class='form-control edit_detect1'>{% else %}"+ row.cote2 +"{% endif %}" ;
+
+        }},
+    {"data":'matricule_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.add_cote or perms.cote.change_cote %}<input type='text' name='note3' id='note3' data-matricule="+ row.matricule_id +" data-session='3' value='"+ row.cote3 +"' class='form-control edit_detect1'>{% else %}"+ row.cote3 +"{% endif %}" ;
+
+        }},
+    {"data":'matricule_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.view_cote %}<button onclick=impression('"+ row.lien+row.matricule__matricule+".jpg') title='voir'><i class='fa fa-eye' style='color: green'></i></button>{% endif %}{% if perms.cote.change_cote %}<button onclick=impression('"+ row.lien+row.matricule__matricule+".pdf') title='modifier'><i class='fa fa-edit' style='color: #A5A5C7'></i></button>{% endif %}{% if perms.cote.delete_cote %}<button onclick=impression('"+ row.lien+row.matricule__matricule+".pdf') title='supprimer'><i class='fa fa-trash' style='color: red'></i></button>{% endif %}" ;
+
+        }}
+
+
+    ],
+
+    "bDestroy":true
+    });
+    }catch(e){
+       //alert(e)
+    }
+    }
+
+
+   function afficher3()
+    {
+
+    try{
+        var cc=$('#etudiant_cours').val();
+        if($('#etudiant_cours').children().length==0)
+            cc=0
+    var oTABLE=$('#example2').DataTable({
+    "bProcessing":true,
+        language: {
+                url: "{% static 'css/fr_fr.json' %}"
+            },
+        ajax: {
+            url: '{% url 'cote:cote' %}',
+            type: 'get',
+            data: {
+                    'numero':$('#numero2').val(),
+                    'matricule':cc,
+                    'annee':$('#annee2').val(),
+                    'compose2':"",
+                    "promotion":$('#promotion2').val()
+                }
+        },
+    "columns":[
+
+    {"data":'cours_id',"autoWidth":true,"render":function (data){
+            return data ;
+
+        }},
+    {"data":'cours__libelle'},
+    {"data":'cours_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.add_cote or perms.cote.change_cote %}<input type='text' name='note1' id='note1' data-cours="+ row.cours_id +" data-session='1' value='"+ row.cote1 +"' class='form-control edit_detect2'>{% else %}"+ row.cote1 +"{% endif %}" ;
+
+        }},
+    {"data":'cours_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.add_cote or perms.cote.change_cote %}<input type='text' name='note2' id='note2' data-cours="+ row.cours_id +" data-session='2' value='"+ row.cote2 +"' class='form-control edit_detect2'>{% else %}"+ row.cote2 +"{% endif %}" ;
+
+        }},
+    {"data":'cours_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.add_cote or perms.cote.change_cote %}<input type='text' name='note3' id='note3' data-cours="+ row.cours_id +" data-session='3' value='"+ row.cote3 +"' class='form-control edit_detect2'>{% else %}"+ row.cote3 +"{% endif %}" ;
+
+        }},
+    {"data":'cours_id',"autoWidth":true,"render":function (data, type, row, meta){
+            return "{% if perms.cote.view_cote %}<button onclick=impression('"+ row.lien+row.matricule__matricule+".jpg') title='voir'><i class='fa fa-eye' style='color: green'></i></button>{% endif %}{% if perms.cote.change_cote %}<button onclick=impression('"+ row.lien+row.matricule__matricule+".pdf') title='modifier'><i class='fa fa-edit' style='color: #A5A5C7'></i></button>{% endif %}{% if perms.cote.delete_cote %}<button onclick=impression('"+ row.lien+row.matricule__matricule+".pdf') title='supprimer'><i class='fa fa-trash' style='color: red'></i></button>{% endif %}" ;
+
+        }}
+
+
+    ],
+
+    "bDestroy":true
+    });
+    }catch(e){
+      // alert(e)
+    }
+    }
+
+    function courspro1()
+    {
+
+         $.ajax({
+                url: "{% url 'cote:cote' %}",
+                method: "get",
+                data: {
+                    'annee':$('#annee').val(),
+                    'courspro':'',
+                    "promotion":$('#promotion').val()
+                },
+                dataType: "json",
+                success: function(data){
+
+                    $('#cours').children().remove();
+
+
+                     $.each(data.data,function(key,value){
+
+                                         $('#cours').append($('<option>',{
+                                              value:value.cours_id,
+                                              text:value.cours__libelle
+                                          }));
+
+                             });
+
+                     afficher();
+
+                },
+                        error: function(request, status, err) {
+
+
+                        }
+            });
+
+    }
+
+    function courspro2()
+    {
+
+         $.ajax({
+                url: "{% url 'cote:cote' %}",
+                method: "get",
+                data: {
+                    "getchange": '',
+                    'annee':$('#annee2').val(),
+                    'categorie':$('#categorie').val(),
+                    "promotion":$('#promotion2').val()
+                },
+                dataType: "json",
+                success: function(data){
+
+
+
+                     $('#etudiant_cours').children().remove();
+
+
+                     $.each(data.data,function(key,value){
+
+                                         $('#etudiant_cours').append($('<option>',{
+                                              value:value.cours_id,
+                                              text:value.cours__libelle
+                                          }));
+                                         if($('#categorie').val()=="1")
+                                             $('#lblce').html("Cours");
+                                         else
+                                             $('#lblce').html("Etudiant");
+                                         $('#etudiant_cours').change();
+
+                             });
+                     if($('#categorie').val()=="1")
+                     {
+                         $('#thbody').html('<tr><th>#</th><th>Nom </th><th width="20">Mi-session</th><th width="20">1er-session</th><th width="20">2ieme-session</th><th>Action</th></tr>');
+                      afficher2();
+                     }
+                     else
+                     {
+
+                         $('#thbody').html('<tr><th>#</th><th>Cours</th><th width="20">Mi-session</th><th width="20">1er-session</th><th width="20">2ieme-session</th><th>Action</th></tr>');
+                      afficher3();
+                     }
+
+
+
+
+
+                },
+                        error: function(request, status, err) {
+
+                               $.toast({
+                                    heading: 'Erreur',
+                                    text: request + status + err,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                        }
+            });
+
+
+    }
+
+
+
+
+    </script>
+{% endblock %}

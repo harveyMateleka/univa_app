@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="container-fluid pt-4 px-4">
+                <div class="row vh-50 bg-secondary rounded align-items-center justify-content-center mx-0">
+                   <div class="col-sm-12 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4">Déliberation</h6>
+
+                            <div class="bg-secondary rounded h-100 p-4">
+                             <nav>
+                                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                                    <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Liste</button>
+                                    <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Décision</button>
+{#                                    <button class="nav-link" id="nav-etudiant-tab" data-bs-toggle="tab" data-bs-target="#nav-etudiant" type="button" role="tab" aria-controls="nav-etudiant" aria-selected="false">Saisie par Etudiant</button>#}
+                                </div>
+                            </nav>
+
+
+                                <div class="tab-content pt-3" id="nav-tabContent">
+                                <div class="tab-pane fade active show" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                                    {% include 'cote/saisiedeliberation.html' %}
+                                </div>
+                                <div class="tab-panes fade"  id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                                    {% include 'cote/saisieprofil.html' %}
+                                </div>
+                               </div>
+
+                        </div>
+
+
+                        </div>
+                    </div>
+                </div>
+ </div>
+
+{% endblock %}
+
+
+ {% block script %}
+
+    <script>
+
+
+$(document).ready(function() {
+
+     $('.select').select2();
+
+$('body').on('change', '.edit_detect2', function(event){
+            var ids = $(this).data('cours');
+            var session = $(this).data('session');
+            var matricule = $(this).data('matricule');
+            var vl = $(this).val();
+            var valo = $(this);
+         $.ajax({
+                url: "{% url 'cote:cote' %}",
+                method: "post",
+                data: {
+                    "matricule": matricule,
+                    "csrfmiddlewaretoken": '{{ csrf_token }}',
+                    "cote": vl,
+                    'numero':$('#numero').val(),
+                    'cours':ids,
+                    'epreuve':session,
+                    'annee':$('#annee').val(),
+                    "promotion":$('#promotion').val()
+                },
+                dataType: "json",
+                success: function(data){
+
+                    if(data.id=='1'){
+                        $.toast({
+                                    heading: 'Information',
+                                    text: data.msg,
+                                    icon: 'success',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                })
+
+                    }else{
+                          $.toast({
+                                    heading: 'Erreur',
+                                    text: data.msg,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                    }
+
+
+                },
+                        error: function(request, status, err) {
+
+                               $.toast({
+                                    heading: 'Erreur',
+                                    text: request + status + err,
+                                    icon: 'error',
+                                    loader: true,        // Change it to false to disable loader
+                                    loaderBg: '#9EC600'  // To change the background
+                                });
+                        }
+            });
+
+    });
+
+
+afficher();
+
+
+                 $('#promotion,#epreuve,#annee').on('change', function()
+                    {
+
+                        afficher();
+
+
+                    });
+
+
+
+
+
+});
+function modaldelibe(id,nom,postnom,pourcentage,mention,nbrechec,nbrechecleger,nbrechecgrave,nbrevide) {
+                        afficher2(id);
+                        var lbl=nom+' '+postnom +' Pourc: '+pourcentage+' Mention: '+mention+' Ech: '+nbrechec+' EchL: '+nbrechecleger+' EchG: '+nbrechecgrave+' Vide: '+nbrevide+' Session: '+$('#epreuve option:selected').text();
+                         $('#etudiantid').html(lbl);
+                         $('#nav-profile-tab').click();
+
+}
+
+
+ function afficher()
+    {
+
+
+    try{
+
+    var oTABLE=$('#example').DataTable({
+    "bProcessing":true,
+        language: {
+                url: "{% static 'css/fr_fr.json' %}"
+            },
+        ajax: {
+            url: '{% url 'cote:listdeliberation' %}',
+            type: 'get',
+            data: {
+                    'epreuve':$('#epreuve').val(),
+                    'annee':$('#annee').val(),
+                    "promotion":$('#promotion').val()
+                }
+        },
+    "columns":[
+
+    {"data":'matricule_id',"autoWidth":true,"render":function (data){
+            return data ;
+
+        }},
+    {"data":'nom'},
+
+    {"data":'postnom'},
+    {"data":'pourcentage'},
+    {"data":'mention'},
+    {"data":'nbrechec'},
+    {"data":'nbrechecleger'},
+    {"data":'nbrechecgrave'},
+    {"data":'nbrevide'},
+    {"data":'matricule_id',"autoWidth":true,"render":function (data, type, row, meta){
+
+            return "{% if perms.cote.deliberation %}<button onclick=modaldelibe('"+ row.matricule_id+"','"+row.nom+"','"+row.postnom+"','"+row.pourcentage+"','"+row.mention+"','"+row.nbrechec+"','"+row.nbrechecleger+"','"+row.nbrechecgrave+"','"+row.nbrevide+"') title='voir'><i class='fa fa-eye' style='color: green'></i></button>{% endif %}" ;
+
+        }}
+
+
+    ],
+
+    "bDestroy":true
+    });
+    }catch(e){
+       //alert(e)
+    }
+    }
+
+
+    function afficher2(id)
+    {
+
+
+    try{
+
+    var oTABLEE=$('#example2').DataTable({
+    "bProcessing":true,
+        language: {
+                url: "{% static 'css/fr_fr.json' %}"
+            },
+     "ordering": false,
+    "pageLength": 50,
+        ajax: {
+            url: '{% url 'cote:listdeliberationone' %}',
+            type: 'get',
+            data: {
+                    'epreuve':$('#epreuve').val(),
+                    'annee':$('#annee').val(),
+                    'numero':$('#numero').val(),
+                    'matricule':id,
+                    "promotion":$('#promotion').val()
+                }
+        },
+    "columns":[
+
+    {"data":'cours__sigle',"autoWidth":true,"render":function (data){
+            return data ;
+
+        }},
+    {"data":'note',"autoWidth":true,"render":function (data, type, row, meta){
+
+        if (row.cours__enseigne__categorie==1)
+            return "{% if perms.cote.deliberation %}<input style='background:#0d6efd;color:white;' type='text' data-cours="+ row.cours_id +" data-matricule="+ id +"  data-session="+ row.sesionn +" value='"+ row.cote+"' class='form-control edit_detect2'>{% else %}"+ row.cote +"{% endif %}" ;
+        else if (row.cours__enseigne__categorie==2)
+            return "{% if perms.cote.deliberation %}<input style='background:#a41515;color:white;' type='text' data-cours="+ row.cours_id +" data-matricule="+ id +"  data-session="+ row.sesionn +" value='"+ row.cote+"' class='form-control edit_detect2'>{% else %}"+ row.cote +"{% endif %}" ;
+        else
+            return "{% if perms.cote.deliberation %}<input style='background:#b6effb;color:black;' type='text' data-cours="+ row.cours_id +" data-matricule="+ id +"  data-session="+ row.sesionn +" value='"+ row.cote+"' class='form-control edit_detect2'>{% else %}"+ row.cote +"{% endif %}" ;
+
+
+
+        }}
+
+
+    ],
+
+    "bDestroy":true
+    });
+    }catch(e){
+       //alert(e)
+    }
+    }
+
+    </script>
+{% endblock %}

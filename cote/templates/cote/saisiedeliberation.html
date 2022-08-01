@@ -1,0 +1,93 @@
+ <form>
+
+
+                                <div class="mb-3">
+
+                                    <div class="row">
+                                    <div class="col-sm-2">
+                                    <label class="form-label">Annee Academique</label>
+                                    <select class="form-control select" id="annee" name="annee">
+                                        {% for foo in annee %}
+                                        <option value="{{ foo.id }}">{{ foo.libelle }}</option>
+                                        {% endfor %}
+
+
+                                    </select>
+
+                                    </div>
+
+                                    <div class="col-sm-8">
+                                        <label for="exampleInputEmail1" class="form-label">Promotion</label>
+                                        <select class="form-control select" id="promotion" name="promotion">
+                                            {% for foo in promotion %}
+                                            <option value="{{ foo.id }}">{{ foo.libelle }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label for="exampleInputEmail1" class="form-label">Epreuve</label>
+                                        <select class="form-control select" id="epreuve" name="epreuve">
+
+                                            <option value="1">Mi-Session</option>
+                                            <option value="2">1ere Session</option>
+                                            <option value="3">2eme Session</option>
+                                            <option value="6">Session Spécial</option>
+
+                                        </select>
+                                        <input type="hidden" class="form-control" value="1" name="numero" id="numero">
+                                    </div>
+
+                                    </div>
+                                    &nbsp;
+{#                                    <div class="row">#}
+{#                                    <div class="col-sm-6">#}
+{#                                   {% if perms.cote.view_cote %} <button  type="button" id="btnaff" class="btn btn-primary">Afficher</button>{% endif %}#}
+{##}
+{#                                    </div>#}
+{##}
+{#                                    </div>#}
+
+                                </div>
+
+
+                            </form>
+                                     <div class="accordion" id="accordionExample">
+                                <div class="accordion-item bg-transparent">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            Liste Cote des Etudiants
+
+                                        </button>
+
+
+
+                                    </h2>
+
+
+                                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                                        <div class="accordion-body">
+
+                                            <div class="table-responsive">
+                                                <table id="example" class="table table-hover dataTable table-striped table_custom border-style spacing5">
+                                                    <thead>
+                                                        <tr>
+                                                        <th>#</th>
+                                                        <th>Nom</th>
+                                                        <th>Postnom</th>
+                                                        <th>Pourc.</th>
+                                                        <th>Mention</th>
+                                                        <th>Nbrechec</th>
+                                                        <th>NbrechecLeger</th>
+                                                        <th>NbrechecGrave</th>
+                                                        <th>Nbrevide</th>
+                                                        <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="txtbody"></tbody>
+
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
