@@ -98,6 +98,7 @@ class promotions(TimespantedModel):
     libelle = models.CharField(max_length=100)
     option = models.ForeignKey(options, models.PROTECT)
     etat = models.BooleanField(default=True)
+    type= models.IntegerField(default=0)
     def __str__(self):
         return self.libelle
     class Meta:

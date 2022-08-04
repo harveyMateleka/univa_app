@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+{% endblock %}
+{% block content %}
+
+<div class="container-fluid pt-4 px-4">
+    <div class="row vh-50 bg-secondary rounded align-items-center justify-content-center mx-0">
+       <div class="col-sm-12 col-xl-12">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h6 class="mb-4">Candidat <a style="float: right" href="{% url 'parametrage:etudiants_create' %}" class="btn btn-outline-warning">Ajouter</a>&nbsp;</h6>
+                <form id="form1">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+
+                        <div class="row">
+                        <div class="col-sm-6">
+                        <label class="form-label">Annee Academique</label>
+                        <select class="form-control select" id="annee" name="annee">
+                           
+                            <option value="-1">Choisir l'année</option>
+                                {% for liste_anne in annee %}
+                                <option value="{{liste_anne.id}}">{{liste_anne.libelle}}</option>
+                                {% endfor %}
+                        </select>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <label for="exampleInputEmail1" class="form-label">Promotion</label>
+                            <select  class="form-control required select" id="promotion" name="promotion">
+                                <option value="-1">Choisir la Promotion</option>
+                                {% for liste in promotion %}
+                                <option value="{{liste.id}}">{{liste.libelle}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                       
+
+                        </div>
+                        &nbsp;
+                        <div class="row">
+                        <div class="col-sm-6">
+                        <button  type="button" id="btnaff" class="btn btn-primary">Afficher</button>
+                        <button type="button" id="btnex" class="btn btn-success"><span id="btnexlbl"></span> Exporter</button>
+
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="row">
+                                <div class="col-sm-10">
+                        <input style="float: left" class="form-control" type="file" title="matr/nom/postnom/prenom/sex/etat_civil/dtnaiss/lieunaiss/tel/email/adr" id="excelfile" name="excelfile">
+                                </div>
+                                <div class="col-sm-2">
+                        <button style="float: right" type="button" id="btnimp" title="matr/nom/postnom/prenom/sex/etat_civil/dtnaiss/lieunaiss/tel/email/adr" class="btn btn-dark"><span id="btnimlbl"></span> Importer</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        </div>
+
+                    </div>
+
+
+                </form>
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item bg-transparent">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                Liste des Candidat
+
+                            </button>
+
+
+
+                        </h2>
+
+
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                            <div class="accordion-body">
+
+                                <div class="table-responsive">
+                                    <table id="tab_candidat" class="table table-hover dataTable table-striped table_custom border-style spacing5">
+                                        <thead>
+                                            <tr>
+                                            <th>#</th>
+                                            <th>Nom</th>
+                                            <th>Postnom</th>
+                                            <th>Prenom</th>
+                                            <th>Sexe</th>
+                                            <th>Telephone</th>
+
+                                            <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbody" style="color: white">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

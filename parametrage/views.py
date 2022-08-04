@@ -209,11 +209,6 @@ class EtudiantsListView(EtudiantsBaseView, ListView):
                             annee_id=self.request.POST.get('codannee'))
 
             return HttpResponse()
-
-
-
-
-
 class EtudiantsDetailView(EtudiantsBaseView, DetailView):
 
     def get_context_data(self, **kwargs):

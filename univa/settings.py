@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'parametrage',
     'cote',
+    'univa',
+    'paiement',
+    'inscription',
 ]
 
 MIDDLEWARE = [
