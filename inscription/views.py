@@ -7,6 +7,9 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.views import View
 from .models import *
 from parametrage.models import annee,promotions
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
 
 # Create your views here.
 
@@ -39,11 +42,48 @@ class CandidatListView(View):
         pass
     
     def get(self, request, *args, **kwargs):
-        data_anne=annee.objects.filter(etat=True)
+        context={
+            "annee":annee.objects.filter(etat=True),
+            "promotion":promotions.objects.filter(etat=True,type=1),
+            "candidat":Candidat.objects.filter(etat=True)
+        }
+        return render(request, 'liste_candidat.html',context)
+
+class CandidatsView(View):
+    def post(self, request,):
+        try:
+            requette= Candidat.objects.get(code_candidat=request.POST.get("code"))
+        except Candidat.DoesNotExist:
+            requette=None
+            Candidat.objects.create(
+                code_candidat = request.POST.get("code"),
+                nom = request.POST.get("name"),
+                postnom = request.POST.get("pastname"),
+                prenom = request.POST.get("Prenom"),
+                sexe = request.POST.get("sexe"),
+                etat_civil = request.POST.get("etatciv"),
+                telephone = request.POST.get("telephone"),
+                adresse = request.POST.get("adresse"),
+                date_naissance = request.POST.get("datnaisse"),
+                lieu_naissance = request.POST.get("lieu"),
+                etat = True,
+                user_id=request.user.id,
+                anne_id=request.POST.get("annee")
+            )
+            messages.success(request, 'Candidat enregistré avec succes')
+            return redirect(reverse('inscription:candidats'))
+           
+                
+         
+    
+    def get(self, request, *args, **kwargs):
         context={
             "annee":annee.objects.filter(etat=True),
             "promotion":promotions.objects.filter(etat=True,type=1)
         }
-        return render(request, 'liste_candidat.html',context)
+        return render(request, 'candidat.html',context)
+    
+
+
     
     

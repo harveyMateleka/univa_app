@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="container-fluid pt-4 px-4">
+                <div class="row vh-50 bg-secondary rounded mx-0">
+                    <div class="col-sm-12 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4">Ajout Candidat</h6>
+                            <form method="post">
+                            {% csrf_token %}
+                                         <div class="row mb-3">
+
+                                    <div class="col-sm-6">
+                                           <label class="form-label">Annee Academique</label>
+                                            <select class="form-control select" id="annee" name="annee">
+                                                <option value="-1">Choisir année</option>
+                                                {% for foo in annee %}
+                                                <option value="{{ foo.id }}"selected>{{ foo.libelle }}</option>
+                                                {% endfor %}
+                                            </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="exampleInputEmail1" class="form-label">Promotion</label>
+                                        <select  class="form-control required select" id="promotion" name="promotion">
+                                            <option value="-1">Choisir année</option>
+                                            {% for foo in promotion %}
+                                            <option value="{{ foo.id }}"selected>{{ foo.libelle }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">Code Candidat</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="code" id="code" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Nom Candidat</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="name" id="name" required>
+                                    </div>
+                                </div>
+                                 <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Post-Nom</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="pastname" id="pastname" required>
+                                    </div>
+                                </div>
+                                 <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Prenom</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="Prenom" id="Prenom" required>
+                                    </div>
+                                </div>
+                                 <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Sexe</label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control select" id="sexe" name="sexe" required>
+                                            <option value="M" selected>Masculin</option>
+                                            <option value="F">Feminin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Etat civil</label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control select" id="etatciv" name="etatciv" required>
+                                            <option value="C" selected>Celibataire</option>
+                                            <option value="M">Marié</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                 <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Date de Naissance</label>
+                                    <div class="col-sm-10">
+                                        <input type="date" class="form-control" name="datnaisse" id="datnaisse" {% now "d-m-Y" %} required>
+                                    </div>
+                                </div>
+                                 <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Lieu de Naissance</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="lieu" id="lieu" required>
+                                    </div>
+                                </div>
+                                 <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Télephone</label>
+                                    <div class="col-sm-10">
+                                        <input type="tel" class="form-control" name="telephone" id="telephone" required>
+                                        <small>Format: 123-456-7890</small>
+                                    </div>
+                                   
+                                </div>
+                                 <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Adresse</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" name="adresse" id="adresse" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Dossier</label>
+                                    <div class="col-sm-10">
+                                        <input type="file" accept="image/*"  multiple class="form-control"  id="dossier" required>
+                                    </div>
+                                </div>
+                            <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Etat</label>
+                                    <div class="col-sm-10">
+                                        <input class="form-check-input m-0" checked name="etat" id="id_etat" type="checkbox">
+
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-12">
+                                <button type="submit" class="btn btn-primary" name="_addanothers">Enregistrer et ajouter un autre </button>
+                                <button type="submit" class="btn btn-danger" name="_continue">Enregistrer et continuer l'édition </button>
+                                <button type="submit" class="btn btn-success" name="_save">Enregistrer</button>
+                                <button type="button" onclick="window.location='{% url 'parametrage:etudiants' %}'; return false;" class="btn btn-outline-warning">Voir la liste</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+ </div>
+
+{% endblock %}
+
+
+ {% block script %}
+
+    <script>
+        (function() {
+            $('.select').select2();
+            $("#telephone").on('input', function(){
+                if(isNaN($("#telephone").val())){
+                    $("#telephone").val('');
+                }
+            })
+
+        })();
+
+
+
+
+
+
+
+
+    </script>
+{% endblock %}

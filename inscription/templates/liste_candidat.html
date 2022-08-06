@@ -9,7 +9,7 @@
     <div class="row vh-50 bg-secondary rounded align-items-center justify-content-center mx-0">
        <div class="col-sm-12 col-xl-12">
             <div class="bg-secondary rounded h-100 p-4">
-                <h6 class="mb-4">Candidat <a style="float: right" href="{% url 'parametrage:etudiants_create' %}" class="btn btn-outline-warning">Ajouter</a>&nbsp;</h6>
+                <h6 class="mb-4">Candidat <a style="float: right" href="{% url 'inscription:candidats' %}" class="btn btn-outline-warning">Ajouter</a>&nbsp;</h6>
                 <form id="form1">
                     {% csrf_token %}
 
@@ -84,16 +84,31 @@
                                         <thead>
                                             <tr>
                                             <th>#</th>
+                                            <th>code</th>
                                             <th>Nom</th>
                                             <th>Postnom</th>
                                             <th>Prenom</th>
                                             <th>Sexe</th>
                                             <th>Telephone</th>
-
                                             <th>Action</th>
+                                           
                                             </tr>
                                         </thead>
                                         <tbody id="tbody" style="color: white">
+                                            {% for ligne in candidat  %}
+                                            <tr>
+                                                <td>{{ligne.id}}</td>
+                                                <td>{{ligne.code_candidat}}</td>
+                                                <td>{{ligne.nom}}</td>
+                                                <td>{{ligne.postnom}}</td>
+                                                <td>{{ligne.prenom}}</td>
+                                                <td>{{ligne.sexe}}</td>
+                                                <td>{{ligne.telephone}}</td>
+                                                <td> <button data-id="{{ligne.id}}" class="btn btn-success btn-circle editerUser"><i class="fa fa-edit"></i></button>
+                                                    <button data-id="{{ligne.id}}" class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -106,3 +121,66 @@
     </div>
 </div>
 {% endblock content %}
+
+{% block script %}
+
+<script>
+    (function() {
+        $('.select').select2();
+        $("#telephone").on('input', function(){
+            if(isNaN($("#telephone").val())){
+                $("#telephone").val('');
+            }
+        })
+
+        $('#tab_candidat').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'print', 'copy', 'excel', 'pdf'
+            ],
+            "bProcessing": true,
+            order:[[0,"DESC"]],
+             "pageLength": 10,
+             "bDestroy":true
+        });
+
+        $('#btnaff').on('click', function(){
+             if($('#annee').val()!='-1'){
+                let tab=[$('#annee').val(),$('#promotion').val()];
+                $.ajax({
+                    url:"/liste_par_anne/"+tab,
+                    type:"GET",
+                    async:true,
+                    success: function(response){
+                        if (response.data.length > 0) {
+                            $("#tab_candidat > tbody").html("");
+                            var row_tab= $('#tab_candidat');
+                            $.each(response.data, function(key,value){
+                                row_tab.append('<tr><td>'+ value.id +'</td><td>'+ value.code_candidat +'</td><td>'+ value.nom +'</td><td>'+ value.postnom +'</td><td>'+ value.prenom +'</td><td>'+ value.sexe +'</td><td>'+ value.telephone +'</td><td><button data-id='+value.id+' class="btn btn-success btn-circle editerUser"><i class="fa fa-edit"></i></button><button data-id='+value.id+' class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button></td></tr>');
+                            });
+                        }
+                        else{
+
+                        }
+                    }
+                });
+
+             }   
+        });
+
+     
+
+    })();
+
+    function affichage (params = []){
+
+
+    }
+
+
+
+
+
+
+</script>
+{% endblock %}
