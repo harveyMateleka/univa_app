@@ -11,7 +11,7 @@
                 <div class="row vh-50 bg-secondary rounded mx-0">
                     <div class="col-sm-12 col-xl-12">
                         <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Ajout Candidat</h6>
+                            <h6 class="mb-4">Paiment Inscription</h6>
                             <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
                                          <div class="row mb-3">
@@ -26,19 +26,19 @@
                                             </select>
                                     </div>
                                     <div class="col-sm-6">
-                                        <label for="exampleInputEmail1" class="form-label">Promotion</label>
+                                        <label for="exampleInputEmail1" class="form-label">Type</label>
                                         <select  class="form-control required select" id="promotion" name="promotion">
-                                            <option value="-1">Choisir année</option>
-                                            {% for foo in promotion %}
+                                            <option value="-1">Type de frais</option>
+                                            {% for foo in frais %}
                                             <option value="{{ foo.id }}">{{ foo.libelle }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
-                                    <label for="inputEmail3" class="col-sm-2 col-form-label">Code Candidat</label>
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">Code valide</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="code" id="code" required>
+                                        <input type="text" class="form-control" name="code" id="code" value='{{code}}'>
                                     </div>
                                 </div>
                                 <div class="row mb-3">

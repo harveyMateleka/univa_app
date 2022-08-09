@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'univa',
     'paiement',
     'inscription',
+    'shortuuid',
 ]
 
 MIDDLEWARE = [

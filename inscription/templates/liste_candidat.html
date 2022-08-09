@@ -97,15 +97,15 @@
                                         <tbody id="tbody" style="color: white">
                                             {% for ligne in candidat  %}
                                             <tr>
-                                                <td>{{ligne.id}}</td>
-                                                <td>{{ligne.code_candidat}}</td>
-                                                <td>{{ligne.nom}}</td>
-                                                <td>{{ligne.postnom}}</td>
-                                                <td>{{ligne.prenom}}</td>
-                                                <td>{{ligne.sexe}}</td>
-                                                <td>{{ligne.telephone}}</td>
-                                                <td> <button data-id="{{ligne.id}}" class="btn btn-success btn-circle editerUser"><i class="fa fa-edit"></i></button>
-                                                    <button data-id="{{ligne.id}}" class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button>
+                                                <td>{{ligne.candidat_id}}</td>
+                                                <td>{{ligne.candidat__code_candidat}}</td>
+                                                <td>{{ligne.candidat__nom}}</td>
+                                                <td>{{ligne.candidat__postnom}}</td>
+                                                <td>{{ligne.candidat__prenom}}</td>
+                                                <td>{{ligne.candidat__sexe}}</td>
+                                                <td>{{ligne.candidat__telephone}}</td>
+                                                <td> <button data-id="{{ligne.candidat_id}}" class="btn btn-success btn-circle editerUser"><i class="fa fa-edit"></i></button>
+                                                    <button data-id="{{ligne.candidat_id}}" class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -144,7 +144,7 @@
              "bDestroy":true
         });
 
-        $('#btnaff').on('click', function(){
+        $('#btnaff').click(function(){
              if($('#annee').val()!='-1'){
                 let tab=[$('#annee').val(),$('#promotion').val()];
                 $.ajax({
@@ -152,15 +152,17 @@
                     type:"GET",
                     async:true,
                     success: function(response){
+                        console.log(response.data);
                         if (response.data.length > 0) {
                             $("#tab_candidat > tbody").html("");
                             var row_tab= $('#tab_candidat');
                             $.each(response.data, function(key,value){
-                                row_tab.append('<tr><td>'+ value.id +'</td><td>'+ value.code_candidat +'</td><td>'+ value.nom +'</td><td>'+ value.postnom +'</td><td>'+ value.prenom +'</td><td>'+ value.sexe +'</td><td>'+ value.telephone +'</td><td><button data-id='+value.id+' class="btn btn-success btn-circle editerUser"><i class="fa fa-edit"></i></button><button data-id='+value.id+' class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button></td></tr>');
+                                row_tab.append('<tr><td>'+ value.candidat_id +'</td><td>'+ value.candidat__code_candidat +'</td><td>'+ value.candidat__nom +'</td><td>'+ value.candidat__postnom +'</td><td>'+ value.candidat__prenom +'</td><td>'+ value.candidat__sexe +'</td><td>'+ value.candidat__telephone +'</td><td><button data-id='+value.candidat_id+' class="btn btn-success btn-circle editerUser"><i class="fa fa-edit"></i></button><button data-id='+value.candidat_id+' class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button></td></tr>');
                             });
+                          
                         }
                         else{
-
+                            $("#tab_candidat > tbody").html("");
                         }
                     }
                 });

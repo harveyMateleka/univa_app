@@ -32,14 +32,35 @@ class Candidat(TimespantedModel):
     lieu_naissance = models.CharField(max_length=100, blank=True, null=True)
     etat = models.BooleanField(default=True)
     user=models.ForeignKey(Utilisat, models.PROTECT,blank=True, null=True)
-    anne=models.ForeignKey(annee, models.PROTECT,blank=True, null=True)
+    reussie=models.CharField(max_length=1, blank=True, null=True,default="0")
     def __str__(self):
         return self.nom
 
 class Dossier(models.Model):
     candidat=models.ForeignKey(Candidat, models.PROTECT,blank=True, null=True)
-    dossier=models.ImageField(upload_to='img_candidat/',default=None,blank=True)
+    dossierss=models.ImageField(upload_to='img_candidat/',default=None,blank=True)
 
 class Testadmin(models.Model):
-     candidat=models.ForeignKey(Candidat, models.PROTECT,blank=True, null=True)
-     classe=models.ForeignKey(promotions, models.PROTECT,blank=True, null=True)
+     candidat=models.ForeignKey(Candidat, models.PROTECT,blank=True, null=True,related_name='candidatest')
+     classe=models.ForeignKey(promotions, models.PROTECT,blank=True, null=True,related_name='codpromo')
+     anne=models.ForeignKey(annee, models.PROTECT,blank=True, null=True)
+
+class Fixation(models.Model):
+    anne=models.ForeignKey(annee, models.PROTECT,editable=True,blank=True, null=True)
+    libelle= models.CharField(max_length=60,blank=True, null=True)
+    montant=models.DecimalField(max_digits=8,decimal_places=2,blank=True, null=True,default=0)
+    etat=models.BooleanField(default=False)
+    devise=models.CharField(max_length=5,blank=True, null=True)
+
+    def __str__(self):
+        return self.libelle
+
+class Paimentinscription(TimespantedModel):
+    prix=models.ForeignKey(Fixation, models.PROTECT,blank=True, null=True)
+    code_candi=models.CharField(max_length=25,blank=True, null=True)
+    observation=models.CharField(max_length=60,blank=True, null=True)
+
+    def __str__(self):
+        return self.code_candi
+
+

@@ -11,5 +11,7 @@ urlpatterns = [
     path('liste_candidat', CandidatListView.as_view(),name='listes_candidats'),
     path('candidat', CandidatsView.as_view(),name='candidats'),
     path('create', CandidatsView.as_view(),name='creates'),
+    path('liste_par_anne/<str:anne>,<str:promotion>', get_candidat),
+    path('paiement', Paiement.as_view(),name='paiement'),
 
 ]
