@@ -12,8 +12,16 @@
                     <div class="col-sm-12 col-xl-12">
                         <div class="bg-secondary rounded h-100 p-4">
                             <h6 class="mb-4">Paiment Inscription</h6>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-dismissible alert-success">
+                                    <strong>{{message}}</strong>
+                                    </div>
+                                {% endfor %}
+                                {% endif %}
                             <form method="post" enctype="multipart/form-data">
                             {% csrf_token %}
+                           
                                          <div class="row mb-3">
 
                                     <div class="col-sm-6">
@@ -33,97 +41,86 @@
                                             <option value="{{ foo.id }}">{{ foo.libelle }}</option>
                                             {% endfor %}
                                         </select>
-                                    </div>
+                                        {% for foo in frais %}
+                                              <input type="hidden" class="form-control" name="m" id="{{ foo.id }}" value="{{ foo.montant }}">
+                                            {% endfor %}
+                                        </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputEmail3" class="col-sm-2 col-form-label">Code valide</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="code" id="code" value='{{code}}'>
+                                    <div class="col-sm-5">
+                                        <input type="text" class="form-control" name="code" id="code" value='{{code}}' required>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <input type="checkbox"  name="" id="checking" />
                                     </div>
                                 </div>
                                 <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Nom Candidat</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="name" id="name" required>
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Montant</label>
+                                    <div class="col-sm-5">
+                                        <input type="text" class="form-control" name="Montant" id="Montant" required>
                                     </div>
                                 </div>
                                  <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Post-Nom</label>
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Candidat</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="pastname" id="pastname" required>
-                                    </div>
-                                </div>
-                                 <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Prenom</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="Prenom" id="Prenom" required>
-                                    </div>
-                                </div>
-                                 <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Sexe</label>
-                                    <div class="col-sm-4">
-                                        <select class="form-control select" id="sexe" name="sexe" required>
-                                            <option value="M" selected>Masculin</option>
-                                            <option value="F">Feminin</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Etat civil</label>
-                                    <div class="col-sm-4">
-                                        <select class="form-control select" id="etatciv" name="etatciv" required>
-                                            <option value="C" selected>Celibataire</option>
-                                            <option value="M">Marié</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                 <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Date de Naissance</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="datnaisse" id="datnaisse" {% now "d-m-Y" %} required>
-                                    </div>
-                                </div>
-                                 <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Lieu de Naissance</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="lieu" id="lieu" required>
-                                    </div>
-                                </div>
-                                 <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Télephone</label>
-                                    <div class="col-sm-10">
-                                        <input type="tel" class="form-control" name="telephone" id="telephone" required>
-                                        <small>Format: 123-456-7890</small>
-                                    </div>
-                                   
-                                </div>
-                                 <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Adresse</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" name="adresse" id="adresse" required>
-                                    </div>
-                                </div>
-                                <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Dossier</label>
-                                    <div class="col-sm-10">
-                                        <input type="file" accept="image/*" name ="img_dossier" multiple class="form-control"  id="img_dossier" required>
-                                    </div>
-                                </div>
-                            <div class="row mb-3">
-                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Etat</label>
-                                    <div class="col-sm-10">
-                                        <input class="form-check-input m-0" checked name="etat" id="id_etat" type="checkbox">
-
+                                        <input type="text" class="form-control" name="Candidat" id="Candidat" required>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-12">
-                                <button type="submit" class="btn btn-primary" name="_addanothers">Enregistrer et ajouter un autre </button>
-                                <button type="submit" class="btn btn-danger" name="_continue">Enregistrer et continuer l'édition </button>
+                                <button type="submit" class="btn btn-danger" name="saving">Enregistrer et continuer l'édition </button>
                                 <button type="submit" class="btn btn-success" name="_save">Enregistrer</button>
-                                <button type="button" onclick="window.location='{% url 'parametrage:etudiants' %}'; return false;" class="btn btn-outline-warning">Voir la liste</button>
                                 </div>
-                            </form>
+                            </form></br></br>
+                            <div class="accordion" id="accordionExample">
+                                <div class="accordion-item bg-transparent">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            Liste de paiement de candidat
+            
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                                        <div class="accordion-body">
+            
+                                            <div class="table-responsive">
+                                                <table id="tab_paiement" class="table table-hover dataTable table-striped table_custom border-style spacing5">
+                                                    <thead>
+                                                        <tr>
+                                                        <th>#</th>
+                                                        <th>Annee</th>
+                                                        <th>Date Paie</th>
+                                                        <th>Devise</th>
+                                                        <th>Montant</th>
+                                                        <th>Code Paiement</th>
+                                                        <th>Candidat</th>
+                                                        <th>Action</th>
+                                                       
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tbody" style="color: white">
+                                                       {% for ligne_paie in paiement  %}
+                                                        <tr>
+                                                            <td>{{ligne_paie.id}}</td> 
+                                                            <td>{{ligne_paie.prix__anne__libelle}}</td> 
+                                                            <td>{{ligne_paie.created_at|date:'d-m-Y'}}</td>
+                                                            <td>{{ligne_paie.prix__devise}}</td> 
+                                                            <td>{{ligne_paie.montant}}</td>   
+                                                            <td>{{ligne_paie.code_candi}}</td>
+                                                            <td>{{ligne_paie.observation}}</td>
+                                                            <td> <button data-id="{{ligne_paie.id}}" class="btn btn-success btn-circle editerpaiement"><i class="fa fa-edit"></i></button>
+                                                                <button data-id="{{ligne_paie.id}}" class="btn btn-warning btn-circle deletepaiement"><i class="fa fa-trash"></i></button>
+                                                            </td> 
+                                                        </tr>
+                                                       {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -137,11 +134,59 @@
     <script>
         (function() {
             $('.select').select2();
+            //document.getElementById('Montant').readonly = false;
+            $("#code").prop("readonly", true);
+            $("#Montant").prop("readonly", true);
+
+
             $("#telephone").on('input', function(){
                 if(isNaN($("#telephone").val())){
                     $("#telephone").val('');
                 }
             })
+            $('#checking').change(function(){
+                if (document.getElementById("checking").checked){
+                    $("#code").prop("readonly", false);
+                }
+                else {
+                    $("#code").prop("readonly", true);
+                }
+            });
+
+            $("#promotion").change(function(){
+                if($("#promotion").val()!='-1'){
+                    let code=$("#promotion").val();
+                    let montant=$("#"+code).val();
+                    $('#Montant').val(montant);
+                }
+            });
+            $('body').delegate('.editerpaiement','click',function(e){
+                var idd=$(this).data('id');
+                    $.ajax({
+                        url:"{% url 'inscription:getpaiement' %}",
+                        type:"POST",
+                        async:true,
+                        data:{
+                            id:idd,
+                            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                        },
+                        success: function(response){
+                            if(response.data !=0){
+                               $("#code").val(response.data[0].code_candi); 
+                               $("#Candidat").val(response.data[0].observation);
+                               $("#Montant").val(response.data[0].montant);
+                               $("#annee").val(response.data[0].prix__anne_id); 
+                               $("#annee").change(); 
+                               $("#promotion").val(response.data[0].prix_id); 
+                               $("#promotion").change();
+         
+                            }
+                        }
+
+                    });
+            });
+          
+           
 
         })();
 

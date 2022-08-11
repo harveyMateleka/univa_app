@@ -13,5 +13,6 @@ urlpatterns = [
     path('create', CandidatsView.as_view(),name='creates'),
     path('liste_par_anne/<str:anne>,<str:promotion>', get_candidat),
     path('paiement', Paiement.as_view(),name='paiement'),
+    path('getpaiement',getpaiement,name='getpaiement'),
 
 ]

@@ -47,26 +47,17 @@ class CandidatListView(View):
         context={
             "annee":annee.objects.filter(etat=True),
             "promotion":promotions.objects.filter(etat=True,type=1),
-            "candidat":Testadmin.objects.filter(candidat__etat=True).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code_candidat','candidat__telephone','candidat__sexe')
+            "candidat":Testadmin.objects.filter(candidat__etat=True).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe')
         }
         return render(request, 'liste_candidat.html',context)
 
 class CandidatsView(View):
     def post(self, request,):
         if request.method == 'POST' and request.FILES :
-             try:
-                 requette= Candidat.objects.get(code_candidat=request.POST.get("code"))
+    
+                 requette = Paimentinscription.objects.get(code_candi= request.POST.get('code'),indice = "0")
                  if requette :
-                      Testadmin.objects.create(
-                        candidat_id=requette.id,
-                        classe_id=request.POST.get("promotion"),
-                        anne_id=request.POST.get("annee")
-                    )
-             except Candidat.DoesNotExist:
-
-                 requette=None
-                 requette=Candidat.objects.create(
-                        code_candidat = request.POST.get("code"),
+                     requettes=Candidat(
                         nom = request.POST.get("name"),
                         postnom = request.POST.get("pastname"),
                         prenom = request.POST.get("Prenom"),
@@ -78,28 +69,32 @@ class CandidatsView(View):
                         lieu_naissance = request.POST.get("lieu"),
                         etat = True,
                         user_id=request.user.id,
-                 )
-                 requette.save()
-                 requette = Candidat.objects.get(code_candidat=request.POST.get("code"))
-                 resu=Testadmin.objects.get(candidat_id=requette.id,classe_id= request.POST.get("promotion"),anne_id=request.POST.get("annee"))
-                 if resu is None:
-                       Testadmin.objects.create(
-                           candidat_id=requette.id,
-                           classe_id=request.POST.get("promotion"),
-                           anne_id=request.POST.get("annee")
-                        )
-                 file_name = request.FILES.getlist('img_dossier')
-                 if file_name:
-                     for image in file_name:
-                         new_file = Dossier(
-                             candidat_id = requette.id,
-                             dossierss = image
-                         )
-                         new_file.save()
-                 else:
-                     print(file_name)
-                 messages.success(request, 'Candidat enregistré avec succes')
-                 return redirect(reverse('inscription:candidats'))
+                        code_id=requette.id
+                     )
+                     requettes.save()
+                     try:
+                         resu=Testadmin.objects.get(candidat_id=requettes.id,classe_id= request.POST.get("promotion"),anne_id=request.POST.get("annee"))
+                     except Testadmin.DoesNotExist:
+                         Testadmin.objects.create(
+                            candidat_id=requettes.id,
+                            classe_id=request.POST.get("promotion"),
+                            anne_id=request.POST.get("annee")
+                            )
+                     file_name = request.FILES.getlist('img_dossier')
+                     if file_name:
+                        for image in file_name:
+                            new_file = Dossier(
+                                candidat_id = requettes.id,
+                                dossierss = image
+                            )
+                            new_file.save()
+                     else:
+                         pass
+                     messages.success(request, 'Candidat enregistré avec succes')
+                     return redirect(reverse('inscription:candidats'))
+                 
+         
+                
             
        
            
@@ -125,7 +120,28 @@ def get_candidat(request,anne,promotion):
 
 class Paiement(View):
     def post(self,request,):
-        pass
+        if request.method =='POST':
+            try:
+                resu=Paimentinscription.objects.get(code_candi= request.POST.get('code'))
+                if resu :
+                     resu.prix_id=request.POST.get('promotion')
+                     resu.code_candi =request.POST.get('code')
+                     resu.observation=request.POST['Candidat']
+                     resu.montant=request.POST.get('Montant')
+                     resu.save()
+                     valeur = 'Modification avec success '
+                     messages.success(request, valeur)
+                     return redirect(reverse('inscription:paiement'))
+            except Paimentinscription.DoesNotExist:
+                saving=Paimentinscription(
+                    prix_id=request.POST.get('promotion'),
+                    code_candi=request.POST.get('code'),
+                    observation=request.POST.get('Candidat'),
+                    montant=request.POST.get('Montant')  
+                )
+            saving.save()
+            messages.success(request, 'paiement enregistré avec succes')
+            return redirect(reverse('inscription:paiement'))
     
     def get(self,request):
        # var=annee.objects.filter(etat=True)
@@ -134,10 +150,16 @@ class Paiement(View):
         context={
             "annee":annee.objects.filter(etat=True),
             "frais":Fixation.objects.filter(etat=True),
-            "code":otp
+            "code":otp,
+            "paiement":Paimentinscription.objects.all().values('id','prix__libelle','prix__anne__libelle','code_candi','observation','montant','created_at','prix__devise').order_by('-id')
         }
 
         return render(request,'paiement.html',context)
+
+def getpaiement(request):
+    if request.method == 'POST':
+        resultat=Paimentinscription.objects.filter(id=request.POST.get('id')).values('id','prix__anne_id','montant','observation','prix_id','code_candi')
+        return JsonResponse({'data':list(resultat)},safe=False)
 
 
     

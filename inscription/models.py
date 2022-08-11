@@ -18,8 +18,25 @@ Etatcivil = (
     ("M","Marié")
     )
 
+class Fixation(models.Model):
+    anne=models.ForeignKey(annee, models.PROTECT,editable=True,blank=True, null=True)
+    libelle= models.CharField(max_length=60,blank=True, null=True)
+    montant=models.DecimalField(max_digits=8,decimal_places=2,blank=True, null=True,default=0)
+    etat=models.BooleanField(default=False)
+    devise=models.CharField(max_length=5,blank=True, null=True)
+
+    def __str__(self):
+        return self.libelle
+class Paimentinscription(TimespantedModel):
+    prix=models.ForeignKey(Fixation, models.PROTECT,blank=True, null=True)
+    code_candi=models.CharField(max_length=25,blank=True, null=True)
+    observation=models.CharField(max_length=60,blank=True, null=True)
+    montant=models.DecimalField(max_digits=8,decimal_places=2,blank=True, null=True,default=0)
+    indice=models.CharField(max_length=1,blank=True, null=True,default="0")
+
+    def __str__(self):
+        return self.code_candi
 class Candidat(TimespantedModel):
-    code_candidat = models.CharField(max_length=50,unique=True)
     nom = models.CharField(max_length=50)
     postnom = models.CharField(max_length=50)
     prenom = models.CharField(max_length=50,blank=True, null=True)
@@ -33,6 +50,8 @@ class Candidat(TimespantedModel):
     etat = models.BooleanField(default=True)
     user=models.ForeignKey(Utilisat, models.PROTECT,blank=True, null=True)
     reussie=models.CharField(max_length=1, blank=True, null=True,default="0")
+    code=models.ForeignKey(Paimentinscription, models.PROTECT,editable=True,blank=True, null=True)
+    
     def __str__(self):
         return self.nom
 
@@ -45,22 +64,8 @@ class Testadmin(models.Model):
      classe=models.ForeignKey(promotions, models.PROTECT,blank=True, null=True,related_name='codpromo')
      anne=models.ForeignKey(annee, models.PROTECT,blank=True, null=True)
 
-class Fixation(models.Model):
-    anne=models.ForeignKey(annee, models.PROTECT,editable=True,blank=True, null=True)
-    libelle= models.CharField(max_length=60,blank=True, null=True)
-    montant=models.DecimalField(max_digits=8,decimal_places=2,blank=True, null=True,default=0)
-    etat=models.BooleanField(default=False)
-    devise=models.CharField(max_length=5,blank=True, null=True)
 
-    def __str__(self):
-        return self.libelle
 
-class Paimentinscription(TimespantedModel):
-    prix=models.ForeignKey(Fixation, models.PROTECT,blank=True, null=True)
-    code_candi=models.CharField(max_length=25,blank=True, null=True)
-    observation=models.CharField(max_length=60,blank=True, null=True)
 
-    def __str__(self):
-        return self.code_candi
 
 
