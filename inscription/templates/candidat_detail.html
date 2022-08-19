@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="container-fluid pt-4 px-4">
+                <div class="row vh-50 bg-secondary rounded align-items-center justify-content-center mx-0">
+                   <div class="col-sm-12 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4">Candidat <a style="float: right" href="{% url 'inscription:candidats' %}" class="btn btn-outline-warning">Retour</a>&nbsp;</h6>
+
+
+                            <div class="row justify-content-center">
+   <div class="col-md-7 col-lg-4 mb-5 mb-lg-0 wow fadeIn">
+      <div class="card border-0 shadow">
+         <img src="{% static 'img/avatar.jpg' %}" alt="...">
+         <div class="card-body p-1-9 p-xl-5">
+            {% for ligne in candidat  %}
+            <div class="mb-4">
+                <h3 class="h4 mb-0" style="color: #0c4128">{{ ligne.nom }}</h3>
+                <span class="text-primary">{{ ligne.postnom }}, {{ ligne.prenom }}</span>
+             </div>
+             <ul class="list-unstyled mb-4">
+                <li class="mb-3"><a href="#!"><i class="far fa-envelope display-25 me-3 text-secondary"></i>{{ ligne.email }}</a></li>
+                <li class="mb-3"><a href="#!"><i class="fas fa-mobile-alt display-25 me-3 text-secondary"></i>{{ ligne.telephone }}</a></li>
+                <li><a href="#!"><i class="fas fa-map-marker-alt display-25 me-3 text-secondary"></i>{{ ligne.adresse }}</a></li>
+             </ul>
+            {% endfor %}
+           
+
+         </div>
+      </div>
+   </div>
+   <div class="col-lg-8">
+      <div class="ps-lg-1-6 ps-xl-5">
+         <div class="mb-5 wow fadeIn">
+            <div class="text-start mb-1-6 wow fadeIn">
+               <h2 class="h1 mb-0 text-primary">#Informations</h2>
+            </div>
+            <p>
+                <div class="col-sm-12 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4"></h6>
+                            <ul class="list-group">
+                                {% for ligne in candidat  %}
+                                <li class="list-group-item bg-transparent">Sexe : {{ ligne.sexe }}</li>
+                                <li class="list-group-item bg-transparent">Etat civil : {{ ligne.etat_civil }}</li>
+                                <li class="list-group-item bg-transparent">Lieu Naiss. : {{ ligne.lieu_naissance }}</li>
+                                <li class="list-group-item bg-transparent">Date Naiss. : {{ ligne.date_naissance|date:'d-m-Y' }}</li>
+                                {% endfor %}
+                                
+                            </ul>
+                        </div>
+                    </div>
+            </p>
+
+         </div>
+         <div class="accordion" id="accordionExample">
+                                <div class="accordion-item bg-transparent">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            Candidature
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                                        <div class="accordion-body">
+                                            <div class="col-sm-12 col-xl-12">
+                                                <div class="bg-secondary rounded h-50 p-4">
+
+                                                    <ul class="list-group list-group-flush">
+                                                        {% for parcour in parcours %}
+                                                        <li class="list-group-item bg-transparent">{{ parcour.anne.libelle }} - {{ parcour.classe.libelle }}</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                             
+                            </div>
+      </div>
+   </div>
+</div>
+                        </div>
+                    </div>
+                </div>
+ </div>
+
+{% endblock %}
+
+
+ {% block script %}
+
+    <script>
+
+$(document).ready(function() {
+
+     $('.select').select2();
+     $('.js-basic-example').DataTable({
+            language: {
+                url: "{% static 'css/fr_fr.json' %}"
+            }
+        });
+
+
+
+
+
+
+});
+
+{#function addImages(id) {#}
+{#  var files = $("#files").prop("files");#}
+{#  var file = files[loopGallery];#}
+{#  var cList = files.length;#}
+{##}
+{#  var fd = new FormData();#}
+{#  fd.append("file", file);#}
+{#  fd.append("galerie", id);#}
+{##}
+{#  var xhr = new XMLHttpRequest();#}
+{#  xhr.open("POST", "moduls/galerie/uploadimages.php", true);#}
+{#  xhr.upload.onprogress = function(e) {#}
+{#    var percentComplete = Math.ceil((e.loaded / e.total) * 100);#}
+{#    $("#progress").css("display","");#}
+{#    $("#progressText").text((loopGallery+1)+" z "+cList);#}
+{#    $("#progressBar").css("width",percentComplete+"%");#}
+{#  };#}
+{##}
+{#  xhr.onload = function() {#}
+{#    if(this.status == 200) {#}
+{#      $("#progressObsah").load("moduls/galerie/showimages.php?ids="+id);#}
+{#      if((loopGallery+1) == cList) {#}
+{#        loopGallery = 0;#}
+{#      } else {#}
+{#        $("#progressBar").css("width", "0%");  #}
+{#        loopGallery++;#}
+{#        addImages(id);#}
+{#      }#}
+{#    }#}
+{#  }#}
+{##}
+{#  if(cList > 0) {#}
+{#    xhr.send(fd);#}
+{#  }#}
+{#}#}
+
+
+
+    </script>
+{% endblock %}

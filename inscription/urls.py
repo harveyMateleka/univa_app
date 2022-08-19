@@ -14,5 +14,9 @@ urlpatterns = [
     path('liste_par_anne/<str:anne>,<str:promotion>', get_candidat),
     path('paiement', Paiement.as_view(),name='paiement'),
     path('getpaiement',getpaiement,name='getpaiement'),
+    path('get_id_candidat/<str:id>',get_id_candidat),
+    path('edit_etudiant',edit_etudiant,name='edit_etudiant'),
+    #path('importation',edit_etudiant,name='edit_etudiant'),
+    
 
 ]

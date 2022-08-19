@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="container-fluid pt-4 px-4">
+                <div class="row vh-50 bg-secondary rounded mx-0">
+                    <div class="col-sm-12 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4">Ajouter Frais Classe</h6>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-dismissible alert-success">
+                                    <strong>{{message}}</strong>
+                                    </div>
+                                {% endfor %}
+                                {% endif %}
+                            <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                           
+                                         <div class="row mb-3">
+
+                                    <div class="col-sm-6">
+                                           <label class="form-label">Annee Academique</label>
+                                            <select class="form-control select" id="annee" name="annee">
+                                                <option value="-1">Choisir année</option>
+                                                {% for foo in annee %}
+                                                <option value="{{ foo.id }}"selected>{{ foo.libelle }}</option>
+                                                {% endfor %}
+                                            </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="exampleInputEmail1" class="form-label">Promotion</label>
+                                        <select  class="form-control required select" id="promotion" name="promotion">
+                                            <option value="-1">Choisir La promotion</option>
+                                            {% for foo in promotion %}
+                                            <option value="{{ foo.id }}">{{ foo.libelle }}</option>
+                                            {% endfor %}
+                                        </select>
+                                      
+                                </div>
+                            </div>
+                                <div class="row mb-3">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">Frais</label>
+                                    <div class="col-sm-5">
+                                        <select  class="form-control required select" id="frais" name="frais">
+                                            <option value="-1">Choisir type Frais</option>
+                                            {% for foo in frais %}
+                                            <option value="{{ foo.id }}">{{ foo.type }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputEmail3" class="col-sm-2 col-form-label">Devise</label>
+                                    <div class="col-sm-5">
+                                        <select  class="form-control required select" id="devise" name="devise">
+                                            <option value="-1">Choisir la devise</option>
+                                            <option value="USD">USD</option>
+                                            <option value="CDF">CDF</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Montant</label>
+                                    <div class="col-sm-5">
+                                        <input type="number" class="form-control" name="Montant" id="Montant" required>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Nbre Tranche</label>
+                                    <div class="col-sm-5">
+                                        <input type="number" class="form-control" name="nbre" id="nbre" required>
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <button type="button" class="btn btn-success" name="saving" id='btntrancher'>Trancher</button>
+                                    </div>
+                                </div>
+                                <div class="row mb-3" id="affichage"> 
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">Tranche</label>
+                                  
+                                </div>
+                                <div class="col-sm-12">
+                                <button type="submit" class="btn btn-success" name="saving">Enregistrer et continuer l'édition </button>
+                                <button type="reset" class="btn btn-danger" name="_save">Annuler</button>
+                                </div>
+                            </form></br></br>
+                            <div class="accordion" id="accordionExample">
+                                <div class="accordion-item bg-transparent">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            Liste de Frais par Promotion
+            
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                                        <div class="accordion-body">
+            
+                                            <div class="table-responsive">
+                                                <table id="tab_frais_classe" class="table table-hover dataTable table-striped table_custom border-style spacing5">
+                                                    <thead>
+                                                        <tr>
+                                                        <th>#</th>
+                                                        <th>Annee</th>
+                                                        <th>Promotion</th>
+                                                        <th>Frais</th>
+                                                        <th>Devise</th>
+                                                        <th>Montant</th>
+                                                        <th>Action</th>
+                                                       
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tbody" style="color: white">
+                                                       {% for ligne_paie in paiement  %}
+                                                        <tr>
+                                                            <td>{{ligne_paie.id}}</td> 
+                                                            <td>{{ligne_paie.prix__anne__libelle}}</td> 
+                                                            <td>{{ligne_paie.created_at|date:'d-m-Y'}}</td>
+                                                            <td>{{ligne_paie.prix__devise}}</td> 
+                                                            <td>{{ligne_paie.montant}}</td>   
+                                                            <td>{{ligne_paie.code_candi}}</td>
+                                                            <td>{{ligne_paie.observation}}</td>
+                                                            <td> <button data-id="{{ligne_paie.id}}" class="btn btn-success btn-circle editerpaiement"><i class="fa fa-edit"></i></button>
+                                                                <button data-id="{{ligne_paie.id}}" class="btn btn-warning btn-circle deletepaiement"><i class="fa fa-trash"></i></button>
+                                                            </td> 
+                                                        </tr>
+                                                       {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+ </div>
+
+{% endblock %}
+
+
+ {% block script %}
+
+    <script>
+        let var_int=0;
+        (function() {
+            $('.select').select2();
+            //document.getElementById('Montant').readonly = false;
+            $("#code").prop("readonly", true);
+           
+
+
+            $("#telephone").on('input', function(){
+                if(isNaN($("#telephone").val())){
+                    $("#telephone").val('');
+                }
+            })
+            $('#checking').change(function(){
+                if (document.getElementById("checking").checked){
+                    $("#code").prop("readonly", false);
+                }
+                else {
+                    $("#code").prop("readonly", true);
+                }
+            });
+
+            $("#promotion").change(function(){
+                if($("#promotion").val()!='-1'){
+                    let code=$("#promotion").val();
+                    let montant=$("#"+code).val();
+                    $('#Montant').val(montant);
+                }
+            });
+            $('body').delegate('.editerpaiement','click',function(e){
+                var idd=$(this).data('id');
+                    $.ajax({
+                        url:"{% url 'inscription:getpaiement' %}",
+                        type:"POST",
+                        async:true,
+                        data:{
+                            id:idd,
+                            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                        },
+                        success: function(response){
+                            if(response.data !=0){
+                               $("#code").val(response.data[0].code_candi); 
+                               $("#Candidat").val(response.data[0].observation);
+                               $("#Montant").val(response.data[0].montant);
+                               $("#annee").val(response.data[0].prix__anne_id); 
+                               $("#annee").change(); 
+                               $("#promotion").val(response.data[0].prix_id); 
+                               $("#promotion").change();
+         
+                            }
+                        }
+
+                    });
+            });
+      
+           $('#btntrancher').click(function(){
+            let nbre=parseInt($("#nbre").val());
+            if(nbre === 1 && var_int === 0){
+                let var_input ="<div class='col-sm-5'><input type='number' class='form-control' name='plage"+nbre+"' id='plage"+nbre+"' required></div>"; 
+                $('#affichage').append(var_input);
+                var_int++;
+            }
+            else if(nbre > 1 && var_int === 0) {
+                let var_input ="";
+                for(var i = 1; i <= nbre; i++) {
+                    var_input +="<div class='col-sm-3'><input type='number' class='form-control' name='plage"+i+"' id='plage"+i+"' required></div>" 
+                }
+                $('#affichage').append(var_input);
+                var_int++;
+            }
+           });
+
+        })();
+
+
+
+function trancherr(){
+    let nombre = parseInt(document.querySelector("#nbre"));
+    if(nombre === 1){
+        var parent = document.querySelector("#affichage");
+                
+        parent.append(input);
+    }
+}
+
+
+
+
+    </script>
+{% endblock %}

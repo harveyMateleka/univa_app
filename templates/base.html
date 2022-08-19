@@ -35,6 +35,7 @@
 {#    <link href="{% static 'lib/datatables/datatables.min.css' %}" rel="stylesheet">#}
     <link href="{% static 'datatable/datatables.min.css' %}" rel="stylesheet">
     <link href="{% static 'lib/select2/css/select2.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/sweetalert2.min.css' %}" rel="stylesheet">
 
  {% block style %}
 
@@ -73,9 +74,17 @@
                     <div class="nav-item dropdown">
                         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-th me-2"></i>Inscription</a>
                         <div class="dropdown-menu bg-transparent border-0">
+                            {% comment %} <a href="{% url 'inscription:importation' %}" class="dropdown-item">Importation Fichier</a> {% endcomment %}
                             <a href="{% url 'inscription:listes_candidats' %}" class="dropdown-item">Liste Candidat</a>
                             <a href="{% url 'inscription:paiement' %}" class="dropdown-item">Paiement</a>
                             <a href="signup.html" class="dropdown-item">Rapport.</a>
+                        </div>
+                    </div>
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-th me-2"></i>Paiement</a>
+                        <div class="dropdown-menu bg-transparent border-0">
+                            {% comment %} <a href="{% url 'inscription:importation' %}" class="dropdown-item">Importation Fichier</a> {% endcomment %}
+                            <a href="{% url 'paiement:paiement_frais' %}" class="dropdown-item">Frais Classe</a>
                         </div>
                     </div>
                     {% if perms.parametrage.view_etudiants %}<a href="{% url 'parametrage:etudiants' %}" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Etudiants</a>{% endif %}
@@ -441,6 +450,7 @@
 
     <!-- JavaScript Libraries -->
     <script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+    <script src="{% static 'js/sweetalert2.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'lib/chart/chart.min.js' %}"></script>
     <script src="{% static 'lib/easing/easing.min.js' %}"></script>

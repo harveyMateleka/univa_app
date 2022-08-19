@@ -28,7 +28,7 @@
           </div>
        <div class="col-sm-12 col-xl-12">
             <div class="bg-secondary rounded h-100 p-4">
-                <h6 class="mb-4">Candidat <a style="float: right" href="{% url 'inscription:candidats' %}" class="btn btn-outline-warning">Ajouter</a>&nbsp;</h6>
+                <h6 class="mb-4">Importation Candidat <a style="float: right" href="{% url 'inscription:candidats' %}" class="btn btn-outline-warning">Ajouter</a>&nbsp;</h6>
                 <form id="form1">
                     {% csrf_token %}
 
@@ -60,20 +60,18 @@
                         </div>
                         &nbsp;
                         <div class="row">
-                        <div class="col-sm-4">
+                        <div class="col-sm-6">
                         <button  type="button" id="btnaff" class="btn btn-primary">Afficher</button>
                         <button type="button" id="btnex" class="btn btn-success"><span id="btnexlbl"></span> Exporter</button>
 
                         </div>
-                        <div class="col-sm-8">
+                        <div class="col-sm-6">
                             <div class="row">
-                                <div class="col-sm-6">
-                        <input style="float: left" class="form-control" type="file"  id="excelfile" name="excelfile">
+                                <div class="col-sm-10">
+                        <input style="float: left" class="form-control" type="file" title="matr/nom/postnom/prenom/sex/etat_civil/dtnaiss/lieunaiss/tel/email/adr" id="excelfile" name="excelfile">
                                 </div>
-                                <div class="col-sm-6">
-                                    <button style="float: right" type="button"  class="btn btn-dark" id="nouveau"><span id="gs"></span>Candidat reussi</button>
-                        <button style="float: center" type="button"  class="btn btn-dark" id="Importer"><span id="g"></span> Importer le Candidat</button>
-                        
+                                <div class="col-sm-2">
+                        <button style="float: right" type="button" id="btnimp" title="matr/nom/postnom/prenom/sex/etat_civil/dtnaiss/lieunaiss/tel/email/adr" class="btn btn-dark"><span id="btnimlbl"></span> Importer</button>
                                 </div>
                             </div>
                         </div>
@@ -244,146 +242,6 @@
                 }
             });
 
-        });
-
-        $('#Importer').click(function(){
-            if($('#annee').val()!='-1' && $('#promotion').val()!='-1'){
-                var form_data = new FormData();
-                var ins = document.getElementById('excelfile').files.length;
-                    if(ins == 0){
-                        $.toast({
-                            heading: 'Erreur',
-                            text: "veuillez choisir le fichier excel",
-                            icon: 'error',
-                            loader: true,        // Change it to false to disable loader
-                            loaderBg: '#9EC600'  // To change the background
-                        });  
-                    } 
-                      else {
-                                csrf_token = $('input[name="csrfmiddlewaretoken"]').val();
-                                form_data.append("csrfmiddlewaretoken", csrf_token);
-                                form_data.append("excelfile", document.getElementById('excelfile').files[0])
-                                form_data.append("importation", 1);
-                                form_data.append("promotion", $('#promotion').val());
-                                form_data.append("annee", $('#annee').val());
-
-                                $.ajax({
-                                    url: "{% url 'inscription:listes_candidats' %}",
-                                type: 'post',
-                                data:form_data,
-                                cache: false,
-                                enctype: 'multipart/form-data',
-                                processData: false,
-                                contentType: false,
-                                success: function(d){
-                                    if(d.statut == 200){
-                                        window.location.reload();
-                                    }
-                                    else if (d.statut == 300){
-                                        $.toast({
-                                            heading: 'Erreur',
-                                            text: "importation echoué",
-                                            icon: 'error',
-                                            loader: true,        // Change it to false to disable loader
-                                            loaderBg: '#9EC600'  // To change the background
-                                        });
-                                    }
-        
-        
-                                },
-                                error: function(request, status, err) {
-                                    $('#btnimlbl').attr('class','');
-                                    $.toast({
-                                            heading: 'Erreur',
-                                            text: request + status + err,
-                                            icon: 'error',
-                                            loader: true,        // Change it to false to disable loader
-                                            loaderBg: '#9EC600'  // To change the background
-                                        });
-                                }
-                                });
-                      }
-
-            }
-            else {
-                $.toast({
-                    heading: 'Erreur',
-                    text: "veuillez choisir les zones",
-                    icon: 'error',
-                    loader: true,        // Change it to false to disable loader
-                    loaderBg: '#9EC600'  // To change the background
-                });
-            }
-        });
-
-        $('#nouveau').click(function(){
-            if($('#annee').val()!='-1' && $('#promotion').val()!='-1'){
-                var form_data = new FormData();
-                var ins = document.getElementById('excelfile').files.length;
-                    if(ins == 0){
-                        $.toast({
-                            heading: 'Erreur',
-                            text: "veuillez choisir le fichier excel",
-                            icon: 'error',
-                            loader: true,        // Change it to false to disable loader
-                            loaderBg: '#9EC600'  // To change the background
-                        });  
-                    } 
-                      else {
-                                csrf_token = $('input[name="csrfmiddlewaretoken"]').val();
-                                form_data.append("csrfmiddlewaretoken", csrf_token);
-                                form_data.append("excelfile", document.getElementById('excelfile').files[0])
-                                form_data.append("candidat_reussie", 1);
-                                form_data.append("promotion", $('#promotion').val());
-                                form_data.append("annee", $('#annee').val());
-
-                                $.ajax({
-                                url: "{% url 'inscription:listes_candidats' %}",
-                                type: 'post',
-                                data:form_data,
-                                cache: false,
-                                enctype: 'multipart/form-data',
-                                processData: false,
-                                contentType: false,
-                                success: function(d){
-                                    if(d.status == 200){
-                                        window.location.reload();
-                                    }
-                                    else {
-                                        $.toast({
-                                            heading: 'Erreur',
-                                            text: "importation echoué",
-                                            icon: 'error',
-                                            loader: true,        // Change it to false to disable loader
-                                            loaderBg: '#9EC600'  // To change the background
-                                        });
-                                    }
-        
-        
-                                },
-                                error: function(request, status, err) {
-                                    $('#btnimlbl').attr('class','');
-                                    $.toast({
-                                            heading: 'Erreur',
-                                            text: request + status + err,
-                                            icon: 'error',
-                                            loader: true,        // Change it to false to disable loader
-                                            loaderBg: '#9EC600'  // To change the background
-                                        });
-                                }
-                                });
-                      }
-
-            }
-            else {
-                $.toast({
-                    heading: 'Erreur',
-                    text: "veuillez choisir les zones",
-                    icon: 'error',
-                    loader: true,        // Change it to false to disable loader
-                    loaderBg: '#9EC600'  // To change the background
-                });
-            }
         });
      
 

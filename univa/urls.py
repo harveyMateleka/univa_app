@@ -23,6 +23,7 @@ urlpatterns = [
     path('', include('parametrage.urls'), name='parametrage'),
     path('', include('cote.urls'), name='cote'),
     path('', include('inscription.urls'), name='inscription'),
+    path('', include('paiement.urls'), name='inscription'),
 ]
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
