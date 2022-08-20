@@ -26,7 +26,7 @@
 
                                     <div class="col-sm-6">
                                            <label class="form-label">Annee Academique</label>
-                                            <select class="form-control select" id="annee" name="annee">
+                                            <select class="form-control select" id="annee" name="anee">
                                                 <option value="-1">Choisir année</option>
                                                 {% for foo in annee %}
                                                 <option value="{{ foo.id }}"selected>{{ foo.libelle }}</option>
@@ -84,6 +84,10 @@
                                     <label for="inputPassword3" class="col-sm-2 col-form-label">Tranche</label>
                                   
                                 </div>
+                                <div class="row mb-3" id="affichage_code" style="display: none"> 
+                                    <label for="inputPassword3" class="col-sm-2 col-form-label">partie</label>
+                                  
+                                </div>
                                 <div class="col-sm-12">
                                 <button type="submit" class="btn btn-success" name="saving">Enregistrer et continuer l'édition </button>
                                 <button type="reset" class="btn btn-danger" name="_save">Annuler</button>
@@ -115,17 +119,16 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody id="tbody" style="color: white">
-                                                       {% for ligne_paie in paiement  %}
+                                                       {% for ligne_paie in Frais_classe  %}
                                                         <tr>
                                                             <td>{{ligne_paie.id}}</td> 
-                                                            <td>{{ligne_paie.prix__anne__libelle}}</td> 
-                                                            <td>{{ligne_paie.created_at|date:'d-m-Y'}}</td>
-                                                            <td>{{ligne_paie.prix__devise}}</td> 
-                                                            <td>{{ligne_paie.montant}}</td>   
-                                                            <td>{{ligne_paie.code_candi}}</td>
-                                                            <td>{{ligne_paie.observation}}</td>
-                                                            <td> <button data-id="{{ligne_paie.id}}" class="btn btn-success btn-circle editerpaiement"><i class="fa fa-edit"></i></button>
-                                                                <button data-id="{{ligne_paie.id}}" class="btn btn-warning btn-circle deletepaiement"><i class="fa fa-trash"></i></button>
+                                                            <td>{{ligne_paie.anne__libelle}}</td> 
+                                                            <td>{{ligne_paie.promotion__libelle}}</td>   
+                                                            <td>{{ligne_paie.frais__type}}</td>
+                                                            <td>{{ligne_paie.devise}}</td>
+                                                            <td>{{ligne_paie.montant}}</td> 
+                                                            <td> <button data-id="{{ligne_paie.id}}" class="btn btn-success btn-circle edit_frais"><i class="fa fa-edit"></i></button>
+                                                                <button data-id="{{ligne_paie.id}}" class="btn btn-warning btn-circle delete_frais"><i class="fa fa-trash"></i></button>
                                                             </td> 
                                                         </tr>
                                                        {% endfor %}
@@ -149,6 +152,18 @@
     <script>
         let var_int=0;
         (function() {
+
+            
+            $('#tab_frais_classe').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'print', 'copy', 'excel', 'pdf'
+                ],
+                "bProcessing": true,
+                order:[[0,"DESC"]],
+                 "pageLength": 10,
+                 "bDestroy":true
+            });
             $('.select').select2();
             //document.getElementById('Montant').readonly = false;
             $("#code").prop("readonly", true);
@@ -169,6 +184,13 @@
                 }
             });
 
+            $('#nbre').on('input', function(){
+                if ($('#nbre').val() > 3){
+                    $('#nbre').val(''); 
+                }
+
+            });
+
             $("#promotion").change(function(){
                 if($("#promotion").val()!='-1'){
                     let code=$("#promotion").val();
@@ -176,10 +198,10 @@
                     $('#Montant').val(montant);
                 }
             });
-            $('body').delegate('.editerpaiement','click',function(e){
+            $('body').delegate('.edit_frais','click',function(e){
                 var idd=$(this).data('id');
                     $.ajax({
-                        url:"{% url 'inscription:getpaiement' %}",
+                        url:"{% url 'paiement:getfrais' %}",
                         type:"POST",
                         async:true,
                         data:{
@@ -187,15 +209,32 @@
                             csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
                         },
                         success: function(response){
-                            if(response.data !=0){
-                               $("#code").val(response.data[0].code_candi); 
-                               $("#Candidat").val(response.data[0].observation);
-                               $("#Montant").val(response.data[0].montant);
-                               $("#annee").val(response.data[0].prix__anne_id); 
-                               $("#annee").change(); 
-                               $("#promotion").val(response.data[0].prix_id); 
-                               $("#promotion").change();
-         
+                            response.frais_classe
+                            $('#annee').val(response.frais_classe[0].anne_id);
+                            $('#annee').change();
+                            $('#promotion').val(response.frais_classe[0].promotion_id);
+                            $('#promotion').change();
+                            $('#frais').val(response.frais_classe[0].frais_id);
+                            $('#frais').change();
+                            $('#devise').val(response.frais_classe[0].devise);
+                            $('#devise').change();
+                            $('#Montant').val(response.frais_classe[0].montant);
+                            $('#nbre').val(response.frais_tranche.length);
+                            if(response.frais_tranche.length > 0) {
+                                $('#affichage').html('');
+                                $('#affichage_code').html('');
+                                let var_input ="";
+                                let var_inputs ="";
+                                let nbre=1;
+                                $.each(response.frais_tranche, function(key,value) {
+                                    var_input +="<div class='col-sm-3'><input type='number' class='form-control' name='plage"+value.id+"' id='plage"+value.id+"' value='"+value.montant+"' required></div>";
+                                    var_inputs+="<div class='col-sm-3'><input type='hidden' class='form-control' name='code"+value.id+"' id='code"+value.id+"' value='"+value.id+"' required></div>";
+                                    nbre++;
+                                });
+                                $('#affichage').append('<label for="inputPassword3" class="col-sm-2 col-form-label">Tranche</label>');
+                                $('#affichage').append(var_input);
+                                $('#affichage_code').append(var_inputs);
+                                $("#btntrancher").prop("disabled", true);
                             }
                         }
 

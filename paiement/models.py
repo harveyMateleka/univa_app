@@ -21,7 +21,7 @@ class Fraisclasse(TimespantedModel):
     montant=models.DecimalField(max_digits=10,decimal_places=2,blank=True, null=True,default=0)
 
 class Fraistranche(TimespantedModel):
-    tranche=models.CharField(max_length=10,blank=True, null=True)
+    tranche=models.CharField(max_length=20,blank=True, null=True)
     montant=models.DecimalField(max_digits=10,decimal_places=2,blank=True, null=True,default=0)
     devise=models.CharField(max_length=5,blank=True, null=True)
     fraistranche=models.ForeignKey(Fraisclasse, models.PROTECT,blank=True, null=True)

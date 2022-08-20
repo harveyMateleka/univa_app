@@ -9,6 +9,7 @@ from django.views import View
 from parametrage.models import annee,promotions,etudiants
 from .models import *
 from django.contrib import messages
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 # Create your views here.
 class TemplateMain(LoginRequiredMixin,TemplateView):
@@ -38,47 +39,115 @@ class Paiement_fraisView(View):
     def post(self, request, *args, **kwargs):
         if request.method == 'POST':
             try:
-                result=Fraisclasse.objects.get(anne_id=self.request.POST.get('annee'),promotion_id=self.request.POST.get('promotion'),frais_id=self.request.POST.get('frais'))
+                result=Fraisclasse.objects.get(anne_id=self.request.POST.get('anee'),promotion_id=self.request.POST.get('promotion'),frais_id=self.request.POST.get('frais'))
                 if result:
-                    result.montant=self.request.POST.get('montant')
-                    result.devise=self.request.POST.get('devise')
-                    result.save()
-                    messages.success(request, 'modification avec succes')
-                    return redirect(reverse('paiement:paiement_frais'))
+                    nbre=int(self.request.POST.get('nbre'))
+                    if nbre == 1:
+                        montant=float(self.request.POST.get('Montant'))
+                        indice='plage'+ str(result.id)
+                        tranche=float(self.request.POST.get(indice))
+                        if montant == tranche:
+                            result.montant=self.request.POST.get('Montant')
+                            result.devise=self.request.POST.get('devise')
+                            requette=Fraistranche.objects.get(fraistranche_id=result.id)
+                            if requette:
+                                requette.montant=tranche
+                                requette.devise=self.request.POST.get('devise')
+                                requette.save()   
+                            result.save()
+                            messages.success(request, 'modification avec succes')
+                            return redirect(reverse('paiement:paiement_frais'))
+                        else:
+                            messages.error(request, 'le montant de la tranche doit etre egal au montant de frais')
+                            return redirect(reverse('paiement:paiement_frais'))
+                    elif nbre > 0:
+                        pass
+                        
                     
                     
             except Fraisclasse.DoesNotExist:
                 result=None
-                nbre=self.request.POST.get('nbre')
+                nbre=int(self.request.POST.get('nbre'))
                 if nbre == 1:
-                    montant=float(self.request.POST.get('montant'))
+                    montant=float(self.request.POST.get('Montant'))
                     tranche=float(self.request.POST.get('plage1'))
                     if montant == tranche:
-                        pass
+                        result=Fraisclasse(
+                           anne_id=self.request.POST.get('anee'),
+                           promotion_id=self.request.POST.get('promotion'),
+                           frais_id=self.request.POST.get('frais'),
+                           montant=self.request.POST.get('Montant'),
+                           devise=self.request.POST.get('devise'))
+                        result.save()
+                        requette=Fraistranche(
+                            tranche='1er Tranche',
+                            montant=self.request.POST.get('plage1'),
+                            devise=self.request.POST.get('devise'),
+                            fraistranche_id=result.id   
+                        )
+                        requette.save()
+                        messages.success(request, 'Frais Classe ajoutée')
+                        return redirect(reverse('paiement:paiement_frais'))
+                       
                     else:
-                       messages.success(request, 'modification avec succes')
-                       return redirect(reverse('paiement:paiement_frais'))
-                        
-                result=Fraisclasse(
-                    anne_id=self.request.POST.get('annee'),
-                    promotion_id=self.request.POST.get('promotion'),
-                    frais_id=self.request.POST.get('frais'),
-                    montant=self.request.POST.get('montant'),
-                    devise=self.request.POST.get('devise'))
-                result.save()
-                
-            
+                        messages.error(request, 'le montant de la tranche doit etre egal au montant de frais')
+                        return redirect(reverse('paiement:paiement_frais'))
+                elif nbre > 1:
+                    montant=float(self.request.POST.get('Montant'))
+                    tranche=0
+                    nbre+=1
+                    for i in range(1,nbre):
+                        indice='plage'+str(i)
+                        tranche +=float(self.request.POST.get(indice))
                     
-                    
-                    
-                messages.success(request, 'operation enregistré avec succes')
-                return redirect(reverse('paiement:paiement_frais'))
-                
+                    if montant == tranche:
+                        result=Fraisclasse(
+                           anne_id=self.request.POST.get('anee'),
+                           promotion_id=self.request.POST.get('promotion'),
+                           frais_id=self.request.POST.get('frais'),
+                           montant=self.request.POST.get('Montant'),
+                           devise=self.request.POST.get('devise'))
+                        result.save()
+                        for i in range(1,nbre):
+                            indice='plage' + str(i)
+                            libtranche =''
+                            if i== 1:
+                                libtranche ='1er Tranche'
+                            elif i== 2:
+                                 libtranche ='2eme Tranche'
+                            else:
+                                libtranche ='3eme Tranche'
+                                
+                            requette=Fraistranche(
+                            tranche=libtranche,
+                            montant=self.request.POST.get(indice),
+                            devise=self.request.POST.get('devise'),
+                            fraistranche_id=result.id   
+                            )
+                            requette.save()
+                            
+                        messages.success(request, 'Frais Classe ajoutée')
+                        return redirect(reverse('paiement:paiement_frais')) 
+                    else:
+                        messages.error(request, 'la repartition de tranche doit correspondre au montant de la promotion')
+                        return redirect(reverse('paiement:paiement_frais'))        
     
     def get(self, request, *args, **kwargs):
         context={
             "annee":annee.objects.filter(etat=True),
             "promotion":promotions.objects.filter(etat=True),
-            "frais":Frais.objects.all()
+            "frais":Frais.objects.all(),
+            "Frais_classe":Fraisclasse.objects.all().values('id','anne__libelle','promotion__libelle','frais__type','devise','montant').order_by('-id'),
         }
         return render(request,"form_frais_classe.html",context)
+
+def getfrais(request):
+    result=Fraisclasse.objects.filter(pk=request.POST.get('id')).values('id','anne_id','promotion_id','frais_id','devise','montant')
+    result1=Fraistranche.objects.filter(fraistranche_id=request.POST.get('id')).values('id','montant',)
+    data={
+        "frais_classe":list(result),
+        "frais_tranche":list(result1)
+    }
+    return JsonResponse(data,safe=False)
+        
+        
