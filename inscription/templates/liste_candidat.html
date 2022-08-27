@@ -111,6 +111,7 @@
                                             <th>Prenom</th>
                                             <th>Sexe</th>
                                             <th>Telephone</th>
+                                            <th>Statut</th>
                                             <th>Action</th>
                                            
                                             </tr>
@@ -125,6 +126,13 @@
                                                 <td>{{ligne.candidat__prenom}}</td>
                                                 <td>{{ligne.candidat__sexe}}</td>
                                                 <td>{{ligne.candidat__telephone}}</td>
+                                                <td>
+                                                    {% if ligne.candidat__reussie == '1'  %}
+                                                        Etudiant
+                                                    {% else %}
+                                                            Candidat au test
+                                                    {% endif %}
+                                                </td>
                                                 <td> <button data-id="{{ligne.candidat_id}}" class="btn btn-success btn-circle editcandidat"><i class="fa fa-edit"></i></button>
                                                     <button data-id="{{ligne.candidat_id}}" class="btn btn-success btn-circle check"><i class="fa fa-check"></i></button>
                                                     <button data-id="{{ligne.candidat_id}}" class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button>
@@ -179,8 +187,10 @@
                         if (response.data.length > 0) {
                             $("#tab_candidat > tbody").html("");
                             var row_tab= $('#tab_candidat');
+                            let statut='';
                             $.each(response.data, function(key,value){
-                                row_tab.append('<tr><td>'+ value.candidat_id +'</td><td>'+ value.candidat__code__code_candi +'</td><td>'+ value.candidat__nom +'</td><td>'+ value.candidat__postnom +'</td><td>'+ value.candidat__prenom +'</td><td>'+ value.candidat__sexe +'</td><td>'+ value.candidat__telephone +'</td><td><button data-id='+value.candidat_id+' class="btn btn-success btn-circle editerUser"><i class="fa fa-edit"></i></button><button data-id='+value.candidat_id+' class="btn btn-warning btn-circle check"><i class="fa fa-check"></i></button><button data-id='+value.candidat_id+' class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button></td></tr>');
+                                statut = value.candidat__reussie == '1' ? 'Etudiant':'Candidat au test';
+                                row_tab.append('<tr><td>'+ value.candidat_id +'</td><td>'+ value.candidat__code__code_candi +'</td><td>'+ value.candidat__nom +'</td><td>'+ value.candidat__postnom +'</td><td>'+ value.candidat__prenom +'</td><td>'+ value.candidat__sexe +'</td><td>'+ value.candidat__telephone +'</td><td>'+ statut +'</td><td><button data-id='+value.candidat_id+' class="btn btn-success btn-circle editerUser"><i class="fa fa-edit"></i></button> <button data-id='+value.candidat_id+' class="btn btn-warning btn-circle check"><i class="fa fa-check"></i></button> <button data-id='+value.candidat_id+' class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button></td></tr>');
                             });
                           
                         }
@@ -245,6 +255,54 @@
             });
 
         });
+
+        $('body').delegate('.deleteUser','click',function(e){
+            var idd=$(this).data('id');
+            Swal.fire({
+                title: 'Univa Application',
+                html: "voulez vous que ce candidat devienne inaccessible",
+                width: 600,
+                padding: '3em',
+                showDenyButton: true,
+                confirmButtonText: `Enregistrer`,
+                denyButtonText: `Annuler`,
+            }).then((result) =>{
+                if(result.isConfirmed){
+                        $.ajax({
+                            url:"{% url 'inscription:desapprov' %}",
+                            type:"POST",
+                            async: true,
+                            data:{id:idd,
+                                  csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                                },
+                            success:function(response){
+                                if(response.status == 200){
+                                    window.location.reload(); 
+                                }
+                                else{
+                                    Swal.fire('Univa Application', 'operation annuler', 'error')
+                                }
+                            },
+                            error:function(response){
+                                console.log(response.success);
+                            }
+                        });
+                  
+                       
+
+                }
+                else if(result.isDenied){
+                    Swal.fire('Univa Application', 'operation echoué', 'error')
+                }
+            });
+
+        });
+
+
+
+
+
+
 
         $('#Importer').click(function(){
             if($('#annee').val()!='-1' && $('#promotion').val()!='-1'){

@@ -198,6 +198,44 @@
                     $('#Montant').val(montant);
                 }
             });
+            $('body').delegate('.delete_frais','click',function(e){
+                var idd=$(this).data('id');
+                Swal.fire({
+                    title: 'Univa Application',
+                    html: "cette operation est irreversible",
+                    width: 600,
+                    padding: '3em',
+                    showDenyButton: true,
+                    confirmButtonText: `Enregistrer`,
+                    denyButtonText: `Annuler`,
+                }).then((result) =>{
+                    if(result.isconfirmed){
+                        $.ajax({
+                            url:"{% url 'paiement:delete_frais' %}",
+                            type:"POST",
+                            async:true,
+                            data:{
+                                id:idd,
+                                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                            },
+                            success: function(response){
+                                if(response.status == 200){
+                                    window.location.reload();
+                                }
+                            },
+                            error: function(response){
+                                console.log(response.success);
+                            }
+    
+                        });
+                    }
+                    else if(result.isdenied){
+                        Swal.fire('Univa Application','operation annuler','info')
+                    }
+                });
+                    
+
+            });
             $('body').delegate('.edit_frais','click',function(e){
                 var idd=$(this).data('id');
                     $.ajax({

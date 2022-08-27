@@ -1,0 +1,445 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="container-fluid pt-4 px-4">
+                <div class="row vh-50 bg-secondary rounded mx-0">
+                    <div class="col-sm-12 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4">Paiement</h6>
+                            {% if messages %}
+                                {% for message in messages %}
+                                    <div class="alert alert-dismissible alert-success">
+                                    <strong>{{message}}</strong>
+                                    </div>
+                                {% endfor %}
+                                {% endif %}
+                            <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                           
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                           <label class="form-label">Annee Academique</label>
+                                            <select class="form-control select" id="annee" name="anee" required>
+                                                <option value="-1">Choisir année</option>
+                                                {% for foo in annee %}
+                                                <option value="{{ foo.id }}"selected>{{ foo.libelle }}</option>
+                                                {% endfor %}
+                                            </select>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="exampleInputEmail1" class="form-label">Promotion</label>
+                                        <select  class="form-control required select" id="promotion" name="promotion">
+                                            <option value="-1">Choisir La promotion</option>
+                                            {% for foo in promotion %}
+                                            <option value="{{ foo.id }}">{{ foo.libelle }}</option>
+                                            {% endfor %}
+                                        </select>
+                                      
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-sm-6">
+                                       <label class="form-label">Etudiant</label>
+                                        <select class="form-control select" id="etudiant" name="etudiant" required>
+                                            <option value="-1">Choisir Etudiant</option>
+                                            {% for etudiants in etudiant %}
+                                            <option value="{{ etudiants.matricule_id }}">{{ etudiants.matricule__matricule}}&nbsp;{{ etudiants.matricule__nom}}&nbsp;{{ etudiants.matricule__postnom}}&nbsp;{{ etudiants.matricule__prenom}}</option>
+                                            {% endfor %}
+                                        </select>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="form-label">Frais</label>
+                                    <select  class="form-control required select" id="frais" name="frais" required>
+                                        <option value="-1">Choisir type Frais</option>
+                                    </select>
+                                    <div id='affichage_code'>
+
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-6">
+                                <label for="inputPassword3" class="col-form-label">Montant Frais</label>
+                                <input type="number" class="form-control" name="montantfrais" id="montantfrais" required>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label">Tranche</label>
+                                <select  class="form-control required select" id="tranche" name="tranche" required>
+                                    <option value="-1">Choisir tranche</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-4">
+                                <label for="inputPassword3" class="col-sm-2 col-form-label">Mont.Tranche</label>
+                                <input type="number" class="form-control" name="montanttranche" id="montanttranche" required>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="inputPassword3" class="col-sm-2 col-form-label">Tot.Payé</label>
+                                <input type="number" class="form-control" name="totalpaye" id="totalpaye" required>
+                            </div>
+                            <div class="col-sm-4">
+                                <label for="inputPassword3" class="col-sm-2 col-form-label">Rest.Payé</label>
+                                <input type="number" class="form-control" name="reste" id="reste" required>
+                            </div>
+                        </div>
+                                <div class="row mb-3">
+                                    <div class="col-sm-6">
+                                        <label for="inputEmail3" class="col-form-label">Montant de paiement</label>
+                                        <input type="number" class="form-control" name="montant" id="montant" required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <label for="inputEmail3" class="col-form-label">Code Paiment</label>
+                                        <div class="row">
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" name="code" id="code" value="{{code}}" required readonly>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <input type="checkbox"  name="" id="checking" />
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                   
+                                  
+                                </div>
+                              
+                             
+                               
+                              
+                                <div class="col-sm-12">
+                                <button type="submit" class="btn btn-success" name="saving">Enregistrer et continuer l'édition </button>
+                                <button type="reset" class="btn btn-danger" name="_save">Annuler</button>
+                                <input type="hidden" class="form-control" name="new_code" id="new_code"  required>
+                                </div>
+                            </form></br></br>
+                            <div class="accordion" id="accordionExample">
+                                <div class="accordion-item bg-transparent">
+                                    <h2 class="accordion-header" id="headingOne">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            Liste de paiement de frais
+            
+                                        </button>
+                                    </h2>
+                                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                                        <div class="accordion-body">
+            
+                                            <div class="table-responsive">
+                                                <table id="tab_paiements" class="table table-hover dataTable table-striped table_custom border-style spacing5">
+                                                    <thead>
+                                                        <tr>
+                                                        <th>#</th>
+                                                        <th>Annee</th>
+                                                        <th>Frais</th>
+                                                        <th>Tranche</th>
+                                                        <th>Montant</th>
+                                                        <th width="300">Etudiant</th>
+                                                        <th>Action</th>
+                                                       
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="tbody" style="color: white">
+                                                      
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+ </div>
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+    let var_int=0;
+    (function() {
+
+        
+        $('#tab_paiements').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'print', 'copy', 'excel', 'pdf'
+            ],
+            "bProcessing": true,
+            order:[[0,"DESC"]],
+             "pageLength": 10,
+             "bDestroy":true
+        });
+
+        $('.select').select2();
+
+        $('#checking').change(function(){
+            if (document.getElementById("checking").checked){
+                $("#code").prop("readonly", false);
+            }
+            else {
+                $("#code").prop("readonly", true);
+            }
+        });
+
+$('#promotion').change(function(){
+if($('#promotion').val() !='-1' && $('#annee').val()!='-1'){
+    let tab=[$('#annee').val(),$('#promotion').val()];
+    get_etudiant(tab); 
+}
+});
+
+$('#frais').on('change',function(){
+if($('#frais').val() !='-1' && $('#promotion').val() !='-1' && $('#annee').val()!='-1'){
+    let code_value=$('#frais').val();
+    let new_code=$('#code_frais'+code_value).val();
+    let value_text=$('#frais option:selected').text();
+    const myarray=value_text.split(" ");
+    let valuer=parseFloat(myarray[2]);
+    $('#montantfrais').val(valuer);
+    $('#new_code').val(new_code);
+    let tab=[$('#annee').val(),$('#promotion').val(),$('#frais').val()];
+    $.ajax({
+        url:'/get_tranche/'+tab,
+        type: 'GET',
+        async:true,
+        success: function(response){
+            if(response.data.length > 0){
+                $('#tranche')
+                .find('option')
+                .remove()
+                .end()
+                .append('<option value="-1">choisir tranche </option>')
+                .val('-1'); 
+                $.each(response.data, function(key,value){
+                    $('#tranche').append('<option value="'+value.id+'">'+value.tranche +' '+value.montant +'</option>').trigger('change'); 
+                });
+
+            }
+        }
+
+    });
+
+    get_motant_paye();
+}
+});
+
+$('#etudiant').on('change', function(){
+    
+        get_motant_paye();
+  
+});
+
+$('#tranche').on('change',function(){
+if($('#tranche').val() !='-1'){
+    let value_text=$('#tranche option:selected').text(); 
+    const myarray=value_text.split(" ");
+    let valuer=parseFloat(myarray[2]);
+    $('#montanttranche').val(valuer);
+}
+});
+
+$('body').delegate('.delete','click',function(e){
+    var idd=$(this).data('id');
+
+    Swal.fire({
+        title: 'Univa Application',
+        html: "voulez vous supprimer ce paiement",
+        width: 600,
+        padding: '3em',
+        showDenyButton: true,
+        confirmButtonText: `delete`,
+        denyButtonText: `Annuler`,
+    }).then((result) =>{
+        if(result.isConfirmed){
+            $.ajax({
+                url:"{% url 'paiement:delete_paie' %}",
+                type:"POST",
+                async:true,
+                data:{
+                    id:idd,
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response){
+                    if(response.status == 200) {
+                        get_motant_paye(); 
+                    }
+                },
+                error: function(response){
+                    console.log(response.success);
+                }
+
+
+            });
+        }
+        else if(result.isDenied){
+            Swal.fire('Univa Application','operation annuler','danger')
+        }
+    });      
+});
+
+
+
+
+function get_etudiant(code=[]){
+$.ajax({
+    url:'/get_etudiant/'+code,
+    type: 'GET',
+    async:true,
+
+    success: function(response){
+        if(response.data.length > 0){
+           
+            $('#etudiant')
+            .find('option')
+            .remove()
+            .end()
+            .append('<option value="-1">choisir Etudiant </option>')
+            .val('-1');
+            $.each(response.data, function(key,value){
+                $('#etudiant').append('<option value="'+value.matricule_id+'">'+value.matricule__matricule +' '+value.matricule__nom +' '+value.matricule__postnom +' '+value.matricule__prenom +'</option>').trigger('change'); 
+                     });
+        }
+        else{
+            $('#etudiant')
+            .find('option')
+            .remove()
+            .end()
+            .append('<option value="-1">choisir Etudiant</option>')
+            .val('-1');
+        }
+
+        if(response.frais.length > 0) {
+            $('#affichage_code').html('');
+            $('#frais')
+            .find('option')
+            .remove()
+            .end()
+            .append('<option value="-1">choisir le frais </option>')
+            .val('-1');
+
+            $.each(response.frais, function(key,value){
+                $('#frais').append('<option value="'+value.id+'">'+value.frais__type +' '+value.montant +' '+value.devise +'</option>').trigger('change');
+                $('#affichage_code').append("<input type='hidden' class='form-control' name='code_frais"+value.id+"' id='code_frais"+value.id+"' value='"+value.frais_id+"'>");
+        
+            });
+        }
+        else{
+            $('#frais')
+            .find('option')
+            .remove()
+            .end()
+            .append('<option value="-1">choisir le frais </option>')
+            .val('-1');
+        }
+      
+    },
+    error: function(response){
+
+    }
+
+});
+}
+function get_motant_paye(){
+
+if ($('#etudiant').val() !='-1' && $('#frais').val()!='-1'){
+    $.ajax({
+        url:"{% url 'paiement:get_montant' %}",
+        type:"POST",
+        async:true,
+        data:{
+            etudiant:$('#etudiant').val(),
+            annee:$('#annee').val(),
+            frais:$('#new_code').val(),
+            csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function(response){
+            let total=parseFloat(response.totalpaye);
+           
+          $('#totalpaye').val(total);
+          let reste = parseFloat($("#montantfrais").val()) - parseFloat($("#totalpaye").val());
+          $("#reste").val(reste);
+          if (response.data.length > 0) {
+                $('#tab_paiements >tbody').html('');
+                $.each(response.data, function(key,value){ 
+                $('#tab_paiements >tbody').append("<tr><td>"+value.id +"</td><td>"+value.anne__libelle+"</td><td>"+value.frais__type+"</td><td>"+value.tranche__tranche+"</td><td>"+
+                    value.montantpaie+"</td><td>"+value.matricule__nom+' '+value.matricule__postnom+' '+value.matricule__prenom+"</td><td><button data-id="+value.id+" class='btn btn-success btn-circle edit_print'><i class='fa fa-print'></i></button> <button data-id="+value.id+" class='btn btn-success btn-circle delete'><i class='fa fa-trash'></i></button></td></tr>"
+                    );  
+                });
+          }
+          else  {
+
+          }
+
+        },
+        error: function(response){
+
+        }
+    });
+}
+}
+
+$("#montant").on("input", function() {
+let montantpaye=parseFloat($("#montant").val());
+let reste=parseFloat($("#reste").val());
+let totalpay=parseFloat($("#totalpaye").val());
+if (montantpaye <= reste) {
+    // c'est bon
+} else {
+    $("#montant").val('');
+}
+});
+
+$('#totalpaye').on('input',function(){
+    if($('#totalpaye').val()!=''){
+        
+        $("#reste").val(reste);
+    }
+    else{
+        let reste = parseFloat($("#montantfrais").val());
+        $("#reste").val(reste);
+    }
+
+});
+
+
+
+
+
+
+
+        //document.getElementById('Montant').readonly = false;
+        $("#code").prop("readonly", true);
+       
+
+
+        $('#checking').change(function(){
+            if (document.getElementById("checking").checked){
+                $("#code").prop("readonly", false);
+            }
+            else {
+                $("#code").prop("readonly", true);
+            }
+        });
+        
+  
+       
+
+    })();
+
+
+
+
+
+
+
+</script>
+{% endblock %}

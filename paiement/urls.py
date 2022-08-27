@@ -8,6 +8,14 @@ urlpatterns = [
     path('home', TemplateMain.as_view(template_name='base.html'),name='home'),
     path('paiement_frais', Paiement_fraisView.as_view(),name='paiement_frais'),
     path('edit_frais_classe', getfrais,name='getfrais'),
+    path('delete_frais',delete_frais,name='delete_frais'),
+    path('paiements',Paiement_templateView.as_view(),name='get_paiements'),
+    path('get_etudiant/<str:anne>,<str:promotion>',get_etudiant),
+    path('get_tranche/<str:anne>,<str:promotion>,<str:frais>',get_tranche),
+    path('get_montant',get_montant,name='get_montant'),
+    path('delete_paie',delete_paie,name='delete_paie'),
+    
+    
   
     #path('importation',edit_etudiant,name='edit_etudiant'),
     

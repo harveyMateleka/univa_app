@@ -85,7 +85,7 @@ class CandidatListView(View):
                 df = pd.read_excel(request.FILES['excelfile'])
                 with transaction.atomic():
                     for candidat in df.values.tolist():
-                        resul=Candidat.objects.get(code__code_candi=candidat[0],code__indice="1")
+                        resul=Candidat.objects.get(code__code_candi=candidat[0],code__indice="1",etat=True)
                         if resul:
                             s = shortuuid.ShortUUID(alphabet="0123456789")
                             otp = s.random(length=5)
@@ -121,7 +121,7 @@ class CandidatListView(View):
         context={
             "annee":annee.objects.filter(etat=True),
             "promotion":promotions.objects.filter(etat=True,type=1),
-            "candidat":Testadmin.objects.filter(candidat__etat=True).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe')
+            "candidat":Testadmin.objects.filter(candidat__etat=True).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe','candidat__reussie')
         }
         return render(request, 'liste_candidat.html',context)
 
@@ -190,11 +190,11 @@ class CandidatsView(View):
 
 def get_candidat(request,anne,promotion):
     if promotion == '-1':
-        requette=Testadmin.objects.filter(anne_id=anne).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe').order_by('candidat_id',)
+        requette=Testadmin.objects.filter(anne_id=anne,candidat__etat=True).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe','candidat__reussie').order_by('candidat_id',)
         data={"data":list(requette)}
         return JsonResponse(data,safe=False)
     else:
-        requette=Testadmin.objects.filter(anne_id=anne,classe_id=promotion).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe').order_by('candidat_id',)
+        requette=Testadmin.objects.filter(anne_id=anne,classe_id=promotion,candidat__etat=True).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe','candidat__reussie').order_by('candidat_id',)
         data={"data":list(requette)}
         return JsonResponse(data,safe=False)
 
@@ -252,7 +252,7 @@ def get_id_candidat(request,id):
 
 def edit_etudiant(request):
     if request.method == 'POST':
-        result=Candidat.objects.get(pk=request.POST.get('id'))
+        result=Candidat.objects.get(pk=request.POST.get('id'),etat=True)
         if result:
             s = shortuuid.ShortUUID(alphabet="0123456789")
             otp = s.random(length=5)
@@ -277,7 +277,14 @@ def edit_etudiant(request):
             )
             result.reussie="1"
             result.save()
-            return JsonResponse({'status':200},safe=False)     
+            return JsonResponse({'status':200},safe=False) 
+
+def desapprov(request):
+    resultat=Candidat.objects.get(id=request.POST.get('id'))
+    if resultat:
+        resultat.etat=False
+        resultat.save()
+        return JsonResponse({'status':200},safe=False)    
             
             
         

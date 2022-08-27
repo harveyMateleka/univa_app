@@ -1,5 +1,5 @@
 from django.db import models
-from parametrage.models import  Utilisat,annee,promotions
+from parametrage.models import  Utilisat,annee,promotions,etudiants
 
 # Create your models here.
 class TimespantedModel(models.Model):
@@ -25,6 +25,15 @@ class Fraistranche(TimespantedModel):
     montant=models.DecimalField(max_digits=10,decimal_places=2,blank=True, null=True,default=0)
     devise=models.CharField(max_length=5,blank=True, null=True)
     fraistranche=models.ForeignKey(Fraisclasse, models.PROTECT,blank=True, null=True)
+
+class Paiement_frais(TimespantedModel):
+    code_paie= models.CharField(max_length=20,blank=True, null=True,unique=True)
+    matricule=models.ForeignKey(etudiants, models.PROTECT,blank=True, null=True,related_name='paie_etudiant')
+    tranche=models.ForeignKey(Fraistranche, models.PROTECT,blank=True, null=True,related_name='paie_tranche')
+    anne=models.ForeignKey(annee, models.PROTECT,blank=True, null=True)
+    montantpaie=models.DecimalField(max_digits=10,decimal_places=2,blank=True, null=True,default=0)
+    user=models.ForeignKey(Utilisat, models.PROTECT,blank=True, null=True) 
+    frais=models.ForeignKey(Frais, models.PROTECT,blank=True, null=True)
 
 
 

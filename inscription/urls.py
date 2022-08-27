@@ -16,6 +16,7 @@ urlpatterns = [
     path('getpaiement',getpaiement,name='getpaiement'),
     path('get_id_candidat/<str:id>',get_id_candidat),
     path('edit_etudiant',edit_etudiant,name='edit_etudiant'),
+    path('desactive_candidat',desapprov,name='desapprov'),
     #path('importation',edit_etudiant,name='edit_etudiant'),
     
 
