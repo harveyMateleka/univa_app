@@ -121,7 +121,7 @@ class CandidatListView(View):
         context={
             "annee":annee.objects.filter(etat=True),
             "promotion":promotions.objects.filter(etat=True,type=1),
-            "candidat":Testadmin.objects.filter(candidat__etat=True).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe','candidat__reussie')
+            "candidat":Testadmin.objects.filter(candidat__etat=True,candidat__reussie='0').values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe','candidat__reussie')
         }
         return render(request, 'liste_candidat.html',context)
 
@@ -133,6 +133,15 @@ class CandidatsView(View):
                  if requette :
                      try:
                          requettes=Candidat.objects.get(nom=request.POST.get("name"),postnom = request.POST.get("pastname"), prenom = request.POST.get("Prenom"))
+                         if requettes:
+                             try:
+                                resu=Testadmin.objects.get(candidat_id=requettes.id,classe_id= request.POST.get("promotion"),anne_id=request.POST.get("annee"))
+                             except Testadmin.DoesNotExist:
+                                Testadmin.objects.create(
+                                    candidat_id=requettes.id,
+                                    classe_id=request.POST.get("promotion"),
+                                    anne_id=request.POST.get("annee")
+                                    )
                      except Candidat.DoesNotExist:
                          requettes=None
                          requettes=Candidat(
@@ -173,14 +182,6 @@ class CandidatsView(View):
                      messages.success(request, 'Candidat enregistré avec succes')
                      return redirect(reverse('inscription:candidats'))
                  
-         
-                
-            
-       
-           
-                
-         
-    
     def get(self, request, *args, **kwargs):
         context={
             "annee":annee.objects.filter(etat=True),
@@ -190,11 +191,11 @@ class CandidatsView(View):
 
 def get_candidat(request,anne,promotion):
     if promotion == '-1':
-        requette=Testadmin.objects.filter(anne_id=anne,candidat__etat=True).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe','candidat__reussie').order_by('candidat_id',)
+        requette=Testadmin.objects.filter(anne_id=anne,candidat__etat=True,candidat__reussie='0').values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe','candidat__reussie').order_by('candidat_id',)
         data={"data":list(requette)}
         return JsonResponse(data,safe=False)
     else:
-        requette=Testadmin.objects.filter(anne_id=anne,classe_id=promotion,candidat__etat=True).values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe','candidat__reussie').order_by('candidat_id',)
+        requette=Testadmin.objects.filter(anne_id=anne,classe_id=promotion,candidat__etat=True,candidat__reussie='0').values('candidat_id','candidat__nom','candidat__postnom','candidat__prenom','candidat__code__code_candi','candidat__telephone','candidat__sexe','candidat__reussie').order_by('candidat_id',)
         data={"data":list(requette)}
         return JsonResponse(data,safe=False)
 

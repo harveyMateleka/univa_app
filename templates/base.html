@@ -86,6 +86,7 @@
                             {% comment %} <a href="{% url 'inscription:importation' %}" class="dropdown-item">Importation Fichier</a> {% endcomment %}
                             <a href="{% url 'paiement:paiement_frais' %}" class="dropdown-item">Frais Classe</a>
                             <a href="{% url 'paiement:get_paiements' %}" class="dropdown-item">Paiement de Frais</a>
+                            <a href="{% url 'paiement:releve_paiement' %}" class="dropdown-item">Relevé de Paiement</a>
                         </div>
                     </div>
                     {% if perms.parametrage.view_etudiants %}<a href="{% url 'parametrage:etudiants' %}" class="nav-item nav-link"><i class="fa fa-th me-2"></i>Etudiants</a>{% endif %}
@@ -113,6 +114,7 @@
                             <a href="blank.html" class="dropdown-item">Liste Cours</a>
                             <a href="blank.html" class="dropdown-item">Liste Prof.</a>
                             <a href="blank.html" class="dropdown-item">Attestation</a>
+                            <a href="{% url 'paiement:rapport_journalier' %}" class="dropdown-item">Rapport journalier de paie</a>
                         </div>
                     </div>
                 <div class="nav-item dropdown">

@@ -1,4 +1,5 @@
 from multiprocessing import context
+from operator import concat
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, permission_required
@@ -8,10 +9,11 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.views import View
 from parametrage.models import annee,promotions,etudiants
 from .models import *
+from django.db.models.functions import Concat
 from cote.models import etudprom
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.db.models import Sum
+from django.db.models import Sum,Value
 import shortuuid
 # Create your views here.
 class TemplateMain(LoginRequiredMixin,TemplateView):
@@ -302,6 +304,44 @@ def get_montant(request):
 def delete_paie(request):
     result = Paiement_frais.objects.filter(id=request.POST.get('id')).delete() 
     return JsonResponse({'status':200},safe=False) 
+
+class Relevent(View):
+    def get(self, request):
+        context={
+            "annee":annee.objects.all().order_by('-id'),
+            "promotion":promotions.objects.filter(etat=True),
+            "etudiant":etudiants.objects.filter(etat=True).values('id','matricule','nom','postnom','prenom'),
+        }
+        return render(request,'releve.html',context)
+    
+    def post(self, request):
+        pass
+
+def get_releve(request,anne,matricule):
+    resultat={}
+    if anne == '-1':
+        resultat=Paiement_frais.objects.filter(matricule_id=matricule).values('id','anne__libelle','frais__type','tranche__tranche','tranche__fraistranche__promotion__libelle','montantpaie','tranche__devise','created_at').order_by('-id')
+    else:
+        resultat=Paiement_frais.objects.filter(matricule_id=matricule,anne_id=anne).values('id','anne__libelle','frais__type','tranche__tranche','tranche__fraistranche__promotion__libelle','montantpaie','tranche__devise','created_at').order_by('-id')
+    
+    return JsonResponse({"data":list(resultat)},safe=False)
+
+def rapport_journalier(request):
+    context={'frais':Frais.objects.all().order_by('-id')}
+    return render(request,'rapport_jour.html',context)
+
+def get_rapportJ(request,dates,frais):
+    resultat={}
+    if frais == '-1':
+        resultat=Paiement_frais.objects.filter(created_at__date=dates).annotate(names=Concat('matricule__nom',Value(' '),'matricule__postnom',Value(' '),'matricule__prenom')).values('id','anne__libelle','frais__type','tranche__tranche','tranche__fraistranche__promotion__libelle','montantpaie','tranche__devise','created_at','names').order_by('-id')
+    else:
+         resultat=Paiement_frais.objects.filter(created_at__date=dates,frais_id=frais).annotate(names=Concat('matricule__nom',Value(' '),'matricule__postnom',Value(' '),'matricule__prenom')).values('id','anne__libelle','frais__type','tranche__tranche','tranche__fraistranche__promotion__libelle','montantpaie','tranche__devise','created_at','names').order_by('-id')
+    return JsonResponse({"data":list(resultat)},safe=False)
+   
+        
+  
+        
+        
     
         
     

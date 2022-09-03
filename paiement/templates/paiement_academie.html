@@ -114,7 +114,7 @@
                                
                               
                                 <div class="col-sm-12">
-                                <button type="submit" class="btn btn-success" name="saving">Enregistrer et continuer l'édition </button>
+                                <button type="submit" class="btn btn-success" name="saving">Enregistrer </button>
                                 <button type="reset" class="btn btn-danger" name="_save">Annuler</button>
                                 <input type="hidden" class="form-control" name="new_code" id="new_code"  required>
                                 </div>
@@ -230,6 +230,9 @@ if($('#frais').val() !='-1' && $('#promotion').val() !='-1' && $('#annee').val()
 
     get_motant_paye();
 }
+else {
+    $('#montantfrais').val("");
+}
 });
 
 $('#etudiant').on('change', function(){
@@ -244,6 +247,9 @@ if($('#tranche').val() !='-1'){
     const myarray=value_text.split(" ");
     let valuer=parseFloat(myarray[2]);
     $('#montanttranche').val(valuer);
+}
+else{
+    $('#montanttranche').val("");
 }
 });
 
@@ -376,7 +382,7 @@ if ($('#etudiant').val() !='-1' && $('#frais').val()!='-1'){
                 });
           }
           else  {
-
+            $('#tab_paiements >tbody').html('');
           }
 
         },

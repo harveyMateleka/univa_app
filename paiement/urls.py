@@ -14,6 +14,10 @@ urlpatterns = [
     path('get_tranche/<str:anne>,<str:promotion>,<str:frais>',get_tranche),
     path('get_montant',get_montant,name='get_montant'),
     path('delete_paie',delete_paie,name='delete_paie'),
+    path('releve_paiement',Relevent.as_view(),name='releve_paiement'),
+    path('get_releve/<str:anne>,<str:matricule>',get_releve),
+    path('rapport_journalier',rapport_journalier,name='rapport_journalier'),
+    path('get_rapportJ/<str:dates>,<str:frais>',get_rapportJ)
     
     
   
