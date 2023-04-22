@@ -89,7 +89,9 @@
                                   
                                 </div>
                                 <div class="col-sm-12">
-                                <button type="submit" class="btn btn-success" name="saving">Enregistrer et continuer l'édition </button>
+                                <button type="submit" class="btn btn-success" name="saving">Sauvegarder </button>
+                                <button type="button" class="btn btn-primary" name="saving" id='btnliste'>Print Frais</button>
+                                <button type="button" class="btn btn-primary" name="saving" id='btndetail'>Print tranche de Frais</button>
                                 <button type="reset" class="btn btn-danger" name="_save">Annuler</button>
                                 </div>
                             </form></br></br>
@@ -199,40 +201,46 @@
                 }
             });
             $('body').delegate('.delete_frais','click',function(e){
-                var idd=$(this).data('id');
+                var code=$(this).data('id');
+
                 Swal.fire({
                     title: 'Univa Application',
-                    html: "cette operation est irreversible",
+                    html: "voulez vous supprimer ce paiement",
                     width: 600,
                     padding: '3em',
                     showDenyButton: true,
-                    confirmButtonText: `Enregistrer`,
+                    confirmButtonText: `delete`,
                     denyButtonText: `Annuler`,
                 }).then((result) =>{
-                    if(result.isconfirmed){
+                    if(result.isConfirmed){
                         $.ajax({
-                            url:"{% url 'paiement:delete_frais' %}",
+                            url:"{% url 'paiement:delete_frais_classe' %}",
                             type:"POST",
-                            async:true,
+                            async:false,
                             data:{
-                                id:idd,
+                                id:code,
                                 csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
                             },
                             success: function(response){
                                 if(response.status == 200){
-                                    window.location.reload();
+                                   window.location.reload(); 
                                 }
+                                console.log(response.success);
+                                //alert("response.status");
+                              
                             },
                             error: function(response){
                                 console.log(response.success);
                             }
-    
+        
                         });
                     }
-                    else if(result.isdenied){
-                        Swal.fire('Univa Application','operation annuler','info')
+                    else if(result.isDenied){
+                        Swal.fire('Univa Application','operation annuler','danger')
                     }
-                });
+                });  
+              
+                
                     
 
             });
@@ -281,6 +289,9 @@
       
            $('#btntrancher').click(function(){
             let nbre=parseInt($("#nbre").val());
+            var_int=0;
+            $('#affichage').html('');
+            $('#affichage').append('<label for="inputPassword3" class="col-sm-2 col-form-label">Tranche</label>');
             if(nbre === 1 && var_int === 0){
                 let var_input ="<div class='col-sm-5'><input type='number' class='form-control' name='plage"+nbre+"' id='plage"+nbre+"' required></div>"; 
                 $('#affichage').append(var_input);
@@ -294,6 +305,56 @@
                 $('#affichage').append(var_input);
                 var_int++;
             }
+           });
+
+           $('#btnliste').click(function(){
+            if($('#annee').val()!='-1' && $('#promotion').val()!='-1'){
+                $.ajax({
+                    url: "{% url 'paiement:liste_frais' %}",
+                    type: "POST",
+                    async: true,
+                    data:{
+                        id_annee:$("#annee").val(),
+                        id_classe:$('#promotion').val(),
+                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function(response){
+                        if(response =="true"){
+                             window.open('{{ MEDIA_URL }}liste_frais_classe.pdf');
+                             }
+    
+                    },
+                    error: function(request, status, err) {
+                        alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+                    }
+                   })
+              }
+
+           });
+
+           $('#btndetail').click(function(){
+            if($('#annee').val()!='-1' && $('#promotion').val()!='-1'){
+                $.ajax({
+                    url: "{% url 'paiement:liste_detail' %}",
+                    type: "POST",
+                    async: true,
+                    data:{
+                        anne:$("#annee").val(),
+                        classe:$('#promotion').val(),
+                        csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function(response){
+                        if(response =="true"){
+                             window.open('{{ MEDIA_URL }}detail_tranche.pdf');
+                             }
+    
+                    },
+                    error: function(request, status, err) {
+                        alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+                    }
+                   })
+              }
+
            });
 
         })();

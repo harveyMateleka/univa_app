@@ -69,7 +69,7 @@
                                 </div>
 
                                 <div class="col-sm-12">
-                                <button type="submit" class="btn btn-success" name="saving">Enregistrer et continuer l'édition </button>
+                                <button type="submit" class="btn btn-success" name="saving">Enregistrer </button>
                                 <button type="reset" class="btn btn-danger" name="_save">Annuler</button>
                                 </div>
                             </form></br></br>
@@ -85,7 +85,7 @@
                                         <div class="accordion-body">
             
                                             <div class="table-responsive">
-                                                <table id="tab_paiement" class="table table-hover dataTable table-striped table_custom border-style spacing5">
+                                                <table id="tab_paiement_cand" class="table table-hover dataTable table-striped table_custom border-style spacing5">
                                                     <thead>
                                                         <tr>
                                                         <th>#</th>
@@ -100,20 +100,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody id="tbody" style="color: white">
-                                                       {% for ligne_paie in paiement  %}
-                                                        <tr>
-                                                            <td>{{ligne_paie.id}}</td> 
-                                                            <td>{{ligne_paie.prix__anne__libelle}}</td> 
-                                                            <td>{{ligne_paie.created_at|date:'d-m-Y'}}</td>
-                                                            <td>{{ligne_paie.prix__devise}}</td> 
-                                                            <td>{{ligne_paie.montant}}</td>   
-                                                            <td>{{ligne_paie.code_candi}}</td>
-                                                            <td>{{ligne_paie.observation}}</td>
-                                                            <td> <button data-id="{{ligne_paie.id}}" class="btn btn-success btn-circle editerpaiement"><i class="fa fa-edit"></i></button>
-                                                                <button data-id="{{ligne_paie.id}}" class="btn btn-warning btn-circle deletepaiement"><i class="fa fa-trash"></i></button>
-                                                            </td> 
-                                                        </tr>
-                                                       {% endfor %}
+                                                   
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -137,7 +124,7 @@
             //document.getElementById('Montant').readonly = false;
             $("#code").prop("readonly", true);
             $("#Montant").prop("readonly", true);
-
+            affiche_paiement();
 
             $("#telephone").on('input', function(){
                 if(isNaN($("#telephone").val())){
@@ -185,17 +172,103 @@
 
                     });
             });
-          
-           
+            
+            $('body').delegate('.deletepaiement','click',function(e){
+                var idd=$(this).data('id');
+                Swal.fire({
+                    title: 'Univa Application',
+                    html: "voulez vous supprimer ce paiement",
+                    width: 600,
+                    padding: '3em',
+                    showDenyButton: true,
+                    confirmButtonText: `supprimer`,
+                    denyButtonText: `Annuler`,
+                }).then((result) =>{
+                    if(result.isConfirmed){
+                        $.ajax({
+                            url:"{% url 'inscription:delete_paie_candi' %}",
+                            type:"POST",
+                            async:true,
+                            data:{
+                                id:idd,
+                                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                            },
+                            success: function(response){
+                                if(response.status == 200){
+                                    Swal.fire("Univa","operation effectuée",'success');
+                                    affiche_paiement();
+                                }
+                                
+                            },
+                            error: function(response){
+                                if(response.status == 500){
+                                    Swal.fire("Univa","ce paiement est lié à un candidat",'info');
+                                }
+                                //console.log(response.success);
+                            }
+    
+                        });
 
+                    }
+                    else if(result.isdenied){
+                        Swal.fire("Univa","operation annulée",'info');
+                    }
+                  
+            });
+        });
+
+            
+          
         })();
 
-
-
-
-
-
-
+        function affiche_paiement() {
+            var otableau = $('#tab_paiement_cand').DataTable({
+               dom: 'Bfrtip',
+               buttons: [
+                  'print', 'copy', 'excel', 'pdf'
+               ],
+               "bProcessing": true,
+               "sAjaxSource": "{% url 'inscription:getpaiement_all' %}",
+               "columns": [{
+                     "data": 'id'
+                  },
+                  {
+                     "data": 'prix__anne__libelle'
+                  },
+                  {
+                     "data": 'created_at', "autoWidth": true, "render": function(data){
+                        var date_test = new Date(data).toLocaleDateString();
+                         return date_test;
+                     }
+                  },
+                  {
+                    "data": 'prix__devise'
+                 },
+                 {
+                    "data": 'montant'
+                 },
+                 {
+                    "data": 'code_candi'
+                 },
+                  {
+                     "data": 'observation'
+                  },
+                  {
+                     "data": 'id',
+                     "autoWidth": true,
+                     "render": function(data) {
+                        return '<button data-id='+data+' class="btn btn-success btn-circle editerpaiement"><i class="fa fa-edit"></i></button> <button data-id='+data+' class="btn btn-warning btn-circle deletepaiement"><i class="fa fa-trash"></i></button>';
+                     }
+                  }
+      
+               ],
+               "bProcessing": true,
+                order:[[0,"DESC"]],
+                "pageLength": 10,
+                "bDestroy":true
+            });
+      
+         }
 
     </script>
 {% endblock %}

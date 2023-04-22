@@ -11,7 +11,7 @@
                 <div class="row vh-50 bg-secondary rounded align-items-center justify-content-center mx-0">
                    <div class="col-sm-12 col-xl-12">
                         <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Candidat <a style="float: right" href="{% url 'inscription:candidats' %}" class="btn btn-outline-warning">Retour</a>&nbsp;</h6>
+                            <h6 class="mb-4">Candidat <a style="float: right" href="{% url 'inscription:listes_candidats' %}" class="btn btn-outline-warning">Retour</a>&nbsp;</h6>
 
 
                             <div class="row justify-content-center">
@@ -78,6 +78,17 @@
                                                     </ul>
                                                 </div>
                                             </div>
+                                            <div class="col-sm-12 col-xl-12">
+                                                <div class="row">
+                                                    {% for document in dossier %}
+                                                    <div class="col-md-4">
+                                                        <img src="{{document.dossierss.url}}" alt="..." width="100" height="100">
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+
+
                                         </div>
                                     </div>
                                 </div>

@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="container-fluid pt-4 px-4">
+                <div class="row vh-50 bg-secondary rounded mx-0">
+                    <div class="col-sm-8 col-xl-12">
+                        <div class="bg-secondary rounded h-100 p-4">
+                            <h6 class="mb-4">Statistique de Candidat</h6>
+                         
+                            <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+                           
+                                         <div class="row mb-3">
+
+                                    <div class="col-sm-6">
+                                           <label class="form-label">Annee Academique</label>
+                                            <select class="form-control select" id="annee" name="anee">
+                                                <option value="-1">Choisir année</option>
+                                                {% for foo in annee %}
+                                                <option value="{{ foo.id }}"selected>{{ foo.libelle }}</option>
+                                                {% endfor %}
+                                            </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        </br>
+                                        <label for="inputEmail3" class="col-form-label">Candidat reussie </label>&nbsp;&nbsp; 
+                                        <input type="checkbox"  name="" id="checking" />
+                                    </div>
+                            
+                            </div>
+                           
+                                <div class="col-sm-12">
+                                <button type="button" class="btn btn-success" name="saving" id='btn_affiche'>Afficher </button>
+                                <button type="button" class="btn btn-danger" name="btn_imprimer" id='btn_imprimer'>Imprimer</button>
+                                </div>
+                            </form></br></br>
+                            <div class="col-sm-12"> 
+                                <div class="accordion" id="accordionExample">
+                                    <div class="accordion-item bg-transparent">
+                                        <h2 class="accordion-header" id="headingOne">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                               Nombre de Candidat par Promotion
+                                            </button>
+                                        </h2>
+                                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
+                                            <div class="accordion-body">
+                                                <div class="table-responsive">
+                                                    <table id="tab_statistique" class="table table-hover dataTable table-striped table_custom border-style spacing5">
+                                                        <thead>
+                                                            <tr>
+                                                            <th width="50%">Promotion</th>
+                                                            <th width="50%">Nombre de Candidat</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="tbody" style="color: white">
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+ </div>
+
+{% endblock %}
+
+
+ {% block script %}
+
+    <script>
+   
+        (function() {
+         
+            $('#btn_affiche').click(function(){
+               let valeur = 0;
+                if($("#annee").val()!='-1'){
+                    if (document.getElementById("checking").checked){
+                        valeur = 1;
+                    }
+                    get_statistique(tab = [$("#annee").val(),valeur]);
+                }
+            });
+
+            $('#btn_imprimer').click(function(){
+                let valeur = 0;
+
+                if($("#annee").val()!='-1'){
+                    if (document.getElementById("checking").checked){
+                        $.ajax({
+                            url: "{% url 'inscription:imprime_statistique_r' %}",
+                            type: "POST",
+                            async: true,
+                            data:{
+                                anne:$("#annee option:selected").text(),
+                                reussie:"1",
+                                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                            },
+                            success: function(response){
+                                if(response =="true"){
+                                     window.open('{{ MEDIA_URL }}statistique_R.pdf');
+                                     }
+        
+                            },
+                            error: function(request, status, err) {
+                                alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+                            }
+                           })
+                    }
+                    else{
+                        $.ajax({
+                            url: "{% url 'inscription:imprime_statistique' %}",
+                            type: "POST",
+                            async: true,
+                            data:{
+                                anne:$("#annee option:selected").text(),
+                                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                            },
+                            success: function(response){
+                                if(response =="true"){
+                                     window.open('{{ MEDIA_URL }}statistique_C.pdf');
+                                     }
+        
+                            },
+                            error: function(request, status, err) {
+                                alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+                            }
+                           })
+
+                    }
+              
+                  }
+                
+                 
+             });
+      
+            
+           
+      
+        
+
+        })();
+
+
+
+function get_statistique(code=[]){
+    var otableau=$('#tab_statistique').DataTable({
+        "bProcessing":true,
+        "sAjaxSource":"/statistique_candidat/"+code,
+        "columns":[
+            {"data":'classe__libelle'},
+            {"data":'nbre'},
+        ],
+        "pageLength": 10, 
+        "bDestroy":true,
+        order:[[0,"DESC"]],
+    });
+}
+
+
+
+    </script>
+{% endblock %}

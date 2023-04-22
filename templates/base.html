@@ -72,12 +72,12 @@
                 <div class="navbar-nav w-100">
                     <a href="{% url 'parametrage:home' %}" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Accueil</a>
                     <div class="nav-item dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-th me-2"></i>Inscription</a>
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-edit me-2"></i>Inscription</a>
                         <div class="dropdown-menu bg-transparent border-0">
                             {% comment %} <a href="{% url 'inscription:importation' %}" class="dropdown-item">Importation Fichier</a> {% endcomment %}
-                            <a href="{% url 'inscription:listes_candidats' %}" class="dropdown-item">Liste Candidat</a>
                             <a href="{% url 'inscription:paiement' %}" class="dropdown-item">Paiement</a>
-                            <a href="signup.html" class="dropdown-item">Rapport.</a>
+                            <a href="{% url 'inscription:listes_candidats' %}" class="dropdown-item">Liste Candidat</a>
+                            <a href="{% url 'inscription:index_inactif' %}" class="dropdown-item">Candidat inactif</a>
                         </div>
                     </div>
                     <div class="nav-item dropdown">
@@ -122,6 +122,7 @@
                         <div class="dropdown-menu bg-transparent border-0">
                             <a href="signin.html" class="dropdown-item">Deliberation</a>
                             <a href="signup.html" class="dropdown-item">Cote</a>
+                            <a href="{% url 'inscription:statistique_C' %}" class="dropdown-item">Candidat inscrit</a>
                         </div>
                     </div>
                 </div>

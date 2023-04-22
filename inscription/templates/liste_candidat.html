@@ -31,17 +31,14 @@
                 <h6 class="mb-4">Candidat <a style="float: right" href="{% url 'inscription:candidats' %}" class="btn btn-outline-warning">Ajouter</a>&nbsp;</h6>
                 <form id="form1">
                     {% csrf_token %}
-
                     <div class="mb-3">
-
                         <div class="row">
                         <div class="col-sm-6">
                         <label class="form-label">Annee Academique</label>
                         <select class="form-control select" id="annee" name="annee">
-                           
                             <option value="-1">Choisir l'année</option>
                                 {% for liste_anne in annee %}
-                                <option value="{{liste_anne.id}}">{{liste_anne.libelle}}</option>
+                                <option value="{{liste_anne.id}}" selected>{{liste_anne.libelle}}</option>
                                 {% endfor %}
                         </select>
 
@@ -62,6 +59,7 @@
                         <div class="row">
                         <div class="col-sm-4">
                         <button  type="button" id="btnaff" class="btn btn-primary">Afficher</button>
+                        <button  type="button" id="btnprint" class="btn btn-success">Imprimer</button>
 
                         </div>
                         <div class="col-sm-8">
@@ -83,6 +81,7 @@
 
 
                 </form>
+                <p style="color: red; font-size:15px;"> Notez bien le fichier à importer doit contenir les données comme suit (code,nom,postnom,prenom,sexe,etat civil,tel,adresse,date naissance,lieu de naissance)</p>
                 <div class="accordion" id="accordionExample">
                     <div class="accordion-item bg-transparent">
                         <h2 class="accordion-header" id="headingOne">
@@ -104,41 +103,19 @@
                                         <thead>
                                             <tr>
                                             <th>#</th>
+                                            <th>Année</th>
+                                            <th>Promo</th>
                                             <th>code</th>
-                                            <th>Nom</th>
+                                            <th width="150">Nom</th>
                                             <th>Postnom</th>
                                             <th>Prenom</th>
                                             <th>Sexe</th>
-                                            <th>Telephone</th>
-                                            <th>Statut</th>
-                                            <th>Action</th>
-                                           
+                                            <th width="150">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody id="tbody" style="color: white">
-                                            {% for ligne in candidat  %}
-                                            <tr>
-                                                <td>{{ligne.candidat_id}}</td>
-                                                <td>{{ligne.candidat__code__code_candi}}</td>
-                                                <td>{{ligne.candidat__nom}}</td>
-                                                <td>{{ligne.candidat__postnom}}</td>
-                                                <td>{{ligne.candidat__prenom}}</td>
-                                                <td>{{ligne.candidat__sexe}}</td>
-                                                <td>{{ligne.candidat__telephone}}</td>
-                                                <td>
-                                                    {% if ligne.candidat__reussie == '1'  %}
-                                                        Etudiant
-                                                    {% else %}
-                                                            Candidat au test
-                                                    {% endif %}
-                                                </td>
-                                                <td> <button data-id="{{ligne.candidat_id}}" class="btn btn-success btn-circle editcandidat"><i class="fa fa-edit"></i></button>
-                                                    <button data-id="{{ligne.candidat_id}}" class="btn btn-success btn-circle check"><i class="fa fa-check"></i></button>
-                                                    <button data-id="{{ligne.candidat_id}}" class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button>
-                                                    
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
+                                           
+                                           
                                         </tbody>
                                     </table>
                                 </div>
@@ -174,30 +151,12 @@
              "bDestroy":true
         });
 
+        affiche_entree(params=[$('#annee').val(),$('#promotion').val()]);
+
         $('#btnaff').click(function(){
              if($('#annee').val()!='-1'){
                 let tab=[$('#annee').val(),$('#promotion').val()];
-                $.ajax({
-                    url:"/liste_par_anne/"+tab,
-                    type:"GET",
-                    async:true,
-                    success: function(response){
-                        console.log(response.data);
-                        if (response.data.length > 0) {
-                            $("#tab_candidat > tbody").html("");
-                            var row_tab= $('#tab_candidat');
-                            let statut='';
-                            $.each(response.data, function(key,value){
-                                statut = value.candidat__reussie == '1' ? 'Etudiant':'Candidat au test';
-                                row_tab.append('<tr><td>'+ value.candidat_id +'</td><td>'+ value.candidat__code__code_candi +'</td><td>'+ value.candidat__nom +'</td><td>'+ value.candidat__postnom +'</td><td>'+ value.candidat__prenom +'</td><td>'+ value.candidat__sexe +'</td><td>'+ value.candidat__telephone +'</td><td>'+ statut +'</td><td><button data-id='+value.candidat_id+' class="btn btn-success btn-circle editerUser"><i class="fa fa-edit"></i></button> <button data-id='+value.candidat_id+' class="btn btn-warning btn-circle check"><i class="fa fa-check"></i></button> <button data-id='+value.candidat_id+' class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button></td></tr>');
-                            });
-                          
-                        }
-                        else{
-                            $("#tab_candidat > tbody").html("");
-                        }
-                    }
-                });
+                affiche_entree(tab);
 
              }   
         });
@@ -206,6 +165,37 @@
             window.location.href = ("/get_id_candidat/" + idd);
 
         });
+
+
+        $('#btnprint').click(function(){
+             if($("#annee").val()!='-1' && $('#promotion').val()!='-1'){
+               $.ajax({
+                url: "{% url 'inscription:liste_candidats' %}",
+                type: "POST",
+                async: true,
+                data:{
+                    anne:$("#annee").val(),
+                    classe:$('#promotion').val(),
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response){
+                    if(response =="true"){
+                         window.open('{{ MEDIA_URL }}liste_candidat.pdf');
+                         }
+
+                },
+                error: function(request, status, err) {
+                    alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+                }
+               })
+             }
+         });
+
+
+
+
+
+
 
         $('body').delegate('.check','click',function(e){
             var idd=$(this).data('id');
@@ -219,7 +209,6 @@
                 denyButtonText: `Annuler`,
             }).then((result) =>{
                 if(result.isConfirmed){
-                    if($('#annee').val()!='-1' && $('#promotion').val()!='-1'){
                         $.ajax({
                             url:"{% url 'inscription:edit_etudiant' %}",
                             type:"POST",
@@ -241,10 +230,8 @@
                                 console.log(response.success);
                             }
                         });
-                    }
-                    else{
-                        Swal.fire('Univa Application', 'veuillez verifier les zonnes de select', 'error')
-                    }
+                   
+                  
                        
 
                 }
@@ -286,9 +273,6 @@
                                 console.log(response.success);
                             }
                         });
-                  
-                       
-
                 }
                 else if(result.isDenied){
                     Swal.fire('Univa Application', 'operation echoué', 'error')
@@ -296,13 +280,6 @@
             });
 
         });
-
-
-
-
-
-
-
         $('#Importer').click(function(){
             if($('#annee').val()!='-1' && $('#promotion').val()!='-1'){
                 var form_data = new FormData();
@@ -446,10 +423,55 @@
 
     })();
 
-    function affichage (params = []){
-
-
-    }
+    function affiche_entree(params=[]) {
+        var otableau = $('#tab_candidat').DataTable({
+           dom: 'Bfrtip',
+           buttons: [
+              'print', 'copy', 'excel', 'pdf'
+           ],
+           "bProcessing": true,
+           "sAjaxSource": "/liste_par_anne/"+params,
+           "columns": [{
+                 "data": 'id'
+              },
+              {
+                 "data": 'anne__libelle'
+              },
+              {
+                 "data": 'classe__libelle'
+              },
+              {
+                "data": 'candidat__code__code_candi'
+             },
+             {
+                "data": 'candidat__nom'
+             },
+             {
+                "data": 'candidat__postnom'
+             },
+              {
+                 "data": 'candidat__prenom'
+              },
+              {
+                "data": 'candidat__sexe'
+             },
+           
+              {
+                 "data": 'id',
+                 "autoWidth": true,
+                 "render": function(data) {
+                    return '<button data-id='+data+' class="btn btn-success btn-circle editcandidat"><i class="fa fa-eye"></i></button> <button data-id='+data+' class="btn btn-success btn-circle check"><i class="fa fa-check"></i></button> <button data-id='+data+' class="btn btn-warning btn-circle deleteUser"><i class="fa fa-trash"></i></button>';
+                 }
+              }
+  
+           ],
+           "bProcessing": true,
+            order:[[0,"DESC"]],
+            "pageLength": 10,
+            "bDestroy":true
+        });
+  
+     }
 
 
 

@@ -11,7 +11,7 @@
                 <div class="row vh-50 bg-secondary rounded mx-0">
                     <div class="col-sm-12 col-xl-12">
                         <div class="bg-secondary rounded h-100 p-4">
-                            <h6 class="mb-4">Rapport Journalier de Paiement</h6>
+                            <h6 class="mb-4">Rapport de Paiement</h6>
                             {% if messages %}
                                 {% for message in messages %}
                                     <div class="alert alert-dismissible alert-success">
@@ -24,22 +24,17 @@
                            
                                 <div class="row mb-3">
                                     <div class="col-sm-6">
-                                    <label class="form-label">Date Paiement</label>
-                                        <input type="date" class="form-control" name="datepaie" id="datepaie" {% now "d-m-Y" %} required>
+                                    <label class="form-label">Du </label>
+                                        <input type="date" class="form-control" name="datepaie" id="datepaie_du" {% now "d-m-Y" %} required>
                                     </div>
-                                            <div class="col-sm-6">
-                                                <label for="exampleInputEmail1" class="form-label">Frais</label>
-                                                <select  class="form-control required select" id="frais" name="frais" required>
-                                                    <option value="-1">Choisir type Frais</option>
-                                                    {% for foo in frais %}
-                                                    <option value="{{ foo.id }}">{{ foo.type }}</option>
-                                                    {% endfor %}
-                                                </select>
-                                            </div>
+                                    <div class="col-sm-6">
+                                        <label class="form-label">Au </label>
+                                            <input type="date" class="form-control" name="datepaie" id="datepaie_au" {% now "d-m-Y" %} required>
+                                        </div>
                             </div>
                             <div class="col-sm-12">
                                 <button type="button" class="btn btn-primary" id="addanothers">Afficher le rapport </button>
-                                <button type="button" class="btn btn-danger" name="_save">Imprimer le rapport</button>
+                                <button type="button" class="btn btn-danger" name="_save" id='print_rapport'>Imprimer le rapport</button>
                             </div>
                             </form></br></br>
                             <div class="accordion" id="accordionExample">
@@ -91,13 +86,50 @@
     let var_int=0;
     (function() {
 $('.select').select2();
+let date1=new Date().toLocaleDateString('en-GB');
+get_motant_releve(code=[date1.split('/').reverse().join("-"), date1.split('/').reverse().join("-")]);
 $('#addanothers').click(function(){
-    if($('#datepaie').val() != ''){
-        var dates = $('#datepaie').val();
+    if($('#datepaie_du').val() != '' && $('#datepaie_au').val() != ''){
+        var dates = $('#datepaie_du').val();
+        var dates_au = $('#datepaie_au').val();
         var newdate=dates.split('/').reverse().join("-");
-        get_motant_releve(code=[newdate,$('#frais').val()])
+        var newdates=dates_au.split('/').reverse().join("-");
+        get_motant_releve(code=[newdate,newdates]);
     }
 });
+
+$('#print_rapport').click(function(){
+    if($('#datepaie_du').val() != '' && $('#datepaie_au').val() != ''){
+        var dates = $('#datepaie_du').val();
+        var dates_au = $('#datepaie_au').val();
+        var newdate=dates.split('/').reverse().join("-");
+        var newdates=dates_au.split('/').reverse().join("-");
+        $.ajax({
+            url: "{% url 'paiement:print_situation' %}",
+            type: 'POST',
+            async: false,
+            data:{
+                date_du:$('#datepaie_du').val(),
+                date_au:$('#datepaie_au').val(),
+                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response){
+                if(response == "true"){
+                    window.open('{{ MEDIA_URL }}situation_paie.pdf');
+                }
+
+            },
+            error: function(request, status, err) {
+                alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+            }
+        })
+    }
+    Swal.fire("Univa","veuillez selectionner les dates","info")
+
+});
+
+
+
 
 function get_motant_releve(code=[]){
     var otableau=$('#tab_releves').DataTable({

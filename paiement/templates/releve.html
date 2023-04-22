@@ -28,7 +28,7 @@
                                             <select class="form-control select" id="annee" name="anee" required>
                                                 <option value="-1">Choisir année</option>
                                                 {% for foo in annee %}
-                                                <option value="{{ foo.id }}"selected>{{ foo.libelle }}</option>
+                                                <option value="{{ foo.id }}">{{ foo.libelle }}</option>
                                                 {% endfor %}
                                             </select>
                                     </div>
@@ -55,7 +55,7 @@
                                 </div>
                                 <div class="col-sm-6">
                                 </br>
-                                    <button type="submit" class="btn btn-primary" name="saving">Print les informations </button>
+                                    <button type="button" class="btn btn-primary" name="print" id='print'>Print releve</button>
                                 </div>
                         </div>
                             </form></br></br>
@@ -82,9 +82,10 @@
                                                         <th>Tranche</th>
                                                         <th >devise</th>
                                                         <th>Montant</th>
+                                                        <th>Action</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody id="tbody" style="color: white">
+                                                    <tbody  style="color: white">
                                                       
                                                     </tbody>
                                                 </table>
@@ -127,8 +128,14 @@ $('#etudiant').on('change', function(){
 
 $('#annee').on('change', function(){
     
-    if($('#etudiant').val() != '-1' && $('#annee')!='-1'){
-        get_motant_releve(code=[$('#annee').val(),$('#etudiant').val()])
+    if($('#annee')!='-1'){
+        if($('#etudiant').val() != '-1'){
+            get_motant_releve(code=[$('#annee').val(),$('#etudiant').val()])
+        }
+        if($('#promotion').val() !='-1'){
+            get_etudiant(tab=[$('#annee').val(),$('#promotion').val()]); 
+        }  
+        
     }
   
 });
@@ -137,6 +144,63 @@ $('#display').click(function(){
     if($('#etudiant').val() != '-1'){
         get_motant_releve(code=[$('#annee').val(),$('#etudiant').val()])
     }
+});
+
+
+
+$('#print').click(function(){
+    if($('#annee').val()!='-1' && $('#etudiant').val()!='-1'){
+        let rows=$("#tab_releve > tbody > tr").length;
+        if(rows === 1){
+            Swal.fire("Univa","pas de paiement pour cet étudiant dans l'année "+$('#annee option:selected').text(),"info")
+        }
+        else{
+            $.ajax({
+                url: "{% url 'paiement:releve_paiement' %}",
+                type: "POST",
+                async: true,
+                data:{
+                    annee:$("#annee").val(),
+                    etudiant:$('#etudiant').val(),
+                    csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function(response){
+                    if(response =="true"){
+                         window.open('{{ MEDIA_URL }}releves.pdf');
+                         }
+
+                },
+                error: function(request, status, err) {
+                    alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+                }
+               }) 
+        }
+       
+       
+      }
+      else{
+      
+      }
+      
+
+   });
+
+$('body').delegate('.edit_print','click',function(){
+    let data_id=parseInt($(this).data('id'));
+    $.ajax({
+        url:"/get_imprimer/"+ data_id,
+        type:"GET",
+        async:false,
+        success: function(response){
+            if(response =="true"){
+                window.open('{{ MEDIA_URL }}reçu_paiement.pdf');
+            }
+        },
+        error: function(request, status, err) {
+            alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+        }
+
+    });
 });
 
 function get_etudiant(code=[]){
@@ -190,7 +254,10 @@ function get_motant_releve(code=[]){
             {"data":'frais__type'},
             {"data":'tranche__tranche'},
             {"data":'tranche__devise'},
-            {"data":'montantpaie'},  
+            {"data":'montantpaie'},
+            {"data":'id',"autoWidth":true,"render":function(data){
+                return "<button data-id="+data+" class='btn btn-success btn-circle edit_print'><i class='fa fa-print'></i></button>"
+            }},  
         ],
         "pageLength": 10, 
         "bDestroy":true,

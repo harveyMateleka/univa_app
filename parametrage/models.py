@@ -35,11 +35,13 @@ class Utilisat(AbstractUser):
 
 class universite(TimespantedModel):
     pays = models.CharField(max_length=50)
+    ministere=models.CharField(max_length=255,default="Ministere de l'Enseignement Superieur et Universitaire")
     ville = models.CharField(max_length=50)
     commune = models.CharField(max_length=50)
     nom = models.CharField(max_length=255)
     sigle = models.CharField(max_length=50)
     siteweb = models.CharField(max_length=50)
+    upload=models.ImageField(upload_to='logo_images',blank=True,null=True)
     def __str__(self):
         return self.nom
     class Meta:

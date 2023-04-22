@@ -90,11 +90,20 @@
                             </div>
                         </div>
                                 <div class="row mb-3">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
+                                        <label for="inputEmail3" class="col-form-label">Devise</label>
+                                        <input type="text" class="form-control" name="devise" id="devise" required readonly>
+                                        {% comment %} <select  class="form-control required select" id="devise" name="devise" required>
+                                            <option value="-1">Choisir Devise</option>
+                                            <option value="USD">DOLLARS</option>
+                                            <option value="CDF">FRANCS CONGOLAIS</option>
+                                        </select> {% endcomment %}
+                                    </div>
+                                    <div class="col-sm-4">
                                         <label for="inputEmail3" class="col-form-label">Montant de paiement</label>
                                         <input type="number" class="form-control" name="montant" id="montant" required>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <label for="inputEmail3" class="col-form-label">Code Paiment</label>
                                         <div class="row">
                                             <div class="col-sm-10">
@@ -114,8 +123,9 @@
                                
                               
                                 <div class="col-sm-12">
-                                <button type="submit" class="btn btn-success" name="saving">Enregistrer </button>
+                                <button type="button" class="btn btn-success" name="saving" id='saving'>Enregistrer </button>
                                 <button type="reset" class="btn btn-danger" name="_save">Annuler</button>
+                                <a  href="{% url 'paiement:rapport_journalier' %}" class="btn btn-outline-warning">Liste de Paiment</a>
                                 <input type="hidden" class="form-control" name="new_code" id="new_code"  required>
                                 </div>
                             </form></br></br>
@@ -129,13 +139,13 @@
                                     </h2>
                                     <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="">
                                         <div class="accordion-body">
-            
+                                           
                                             <div class="table-responsive">
                                                 <table id="tab_paiements" class="table table-hover dataTable table-striped table_custom border-style spacing5">
                                                     <thead>
                                                         <tr>
                                                         <th>#</th>
-                                                        <th>Annee</th>
+                                                        <th width="150">Annee</th>
                                                         <th>Frais</th>
                                                         <th>Tranche</th>
                                                         <th>Montant</th>
@@ -206,6 +216,7 @@ if($('#frais').val() !='-1' && $('#promotion').val() !='-1' && $('#annee').val()
     let valuer=parseFloat(myarray[2]);
     $('#montantfrais').val(valuer);
     $('#new_code').val(new_code);
+    $('#devise').val($('#frais option:selected').data('devise'));
     let tab=[$('#annee').val(),$('#promotion').val(),$('#frais').val()];
     $.ajax({
         url:'/get_tranche/'+tab,
@@ -236,10 +247,60 @@ else {
 });
 
 $('#etudiant').on('change', function(){
-    
         get_motant_paye();
   
 });
+
+$('#saving').click(function(){
+    if(verification()){
+        $.ajax({
+            url:"{% url 'paiement:get_paiements' %}",
+            type:"POST",
+            async: false,
+            data:{totalpaye:$('#totalpaye').val(),
+                  tranche:$('#tranche').val(),
+                  frais:$('#frais').val(),
+                  montanttranche:$('#montanttranche').val(),
+                  code:$('#code').val(),
+                  etudiant:$('#etudiant').val(),
+                  anee:$('#annee').val(),
+                  montant:$('#montant').val(),
+                  new_code:$('#new_code').val(),
+                  montantfrais:$('#montantfrais').val(),
+                  promotion:$('#promotion').val(),
+                  devise:$('#devise').val(),
+                  csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val()
+            },
+            success:function(response){
+                if(response == "true"){
+                    window.open('{{ MEDIA_URL }}reçu_paiement.pdf');
+                    get_motant_paye();
+                }
+                else {
+                    Swal.fire("Application",response.message,"info")
+                }
+    
+           },
+           error: function(request, status, err) {
+               alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+           }
+    
+        });
+    }
+    
+});
+
+function verification(){
+    if($('#totalpaye').val()!='' && $('#tranche').val()!='-1' && $('#frais').val()!='-1' && $('#montanttranche').val()!='' && $('#code').val()!='' && $('#devise').val()!='')
+    {
+        if($('#etudiant').val()!='-1' && $('#annee').val()!='-1' && $('#montant').val()!='' && $('#new_code').val()!='' && $('#montantfrais').val()!='' && $('#promotion').val()!='-1'){
+            return true;
+        }
+    }
+}
+
+
+
 
 $('#tranche').on('change',function(){
 if($('#tranche').val() !='-1'){
@@ -255,7 +316,6 @@ else{
 
 $('body').delegate('.delete','click',function(e){
     var idd=$(this).data('id');
-
     Swal.fire({
         title: 'Univa Application',
         html: "voulez vous supprimer ce paiement",
@@ -333,7 +393,7 @@ $.ajax({
             .val('-1');
 
             $.each(response.frais, function(key,value){
-                $('#frais').append('<option value="'+value.id+'">'+value.frais__type +' '+value.montant +' '+value.devise +'</option>').trigger('change');
+                $('#frais').append('<option data-devise="'+value.devise +'" value="'+value.id+'">'+value.frais__type +' '+value.montant +' '+value.devise +'</option>').trigger('change');
                 $('#affichage_code').append("<input type='hidden' class='form-control' name='code_frais"+value.id+"' id='code_frais"+value.id+"' value='"+value.frais_id+"'>");
         
             });
@@ -356,7 +416,7 @@ $.ajax({
 }
 function get_motant_paye(){
 
-if ($('#etudiant').val() !='-1' && $('#frais').val()!='-1'){
+if ($('#etudiant').val() !='-1'){
     $.ajax({
         url:"{% url 'paiement:get_montant' %}",
         type:"POST",
@@ -369,7 +429,6 @@ if ($('#etudiant').val() !='-1' && $('#frais').val()!='-1'){
         },
         success: function(response){
             let total=parseFloat(response.totalpaye);
-           
           $('#totalpaye').val(total);
           let reste = parseFloat($("#montantfrais").val()) - parseFloat($("#totalpaye").val());
           $("#reste").val(reste);
@@ -392,6 +451,24 @@ if ($('#etudiant').val() !='-1' && $('#frais').val()!='-1'){
     });
 }
 }
+
+$('body').delegate('.edit_print','click',function(){
+    let data_id=parseInt($(this).data('id'));
+    $.ajax({
+        url:"/get_imprimer/"+ data_id,
+        type:"GET",
+        async:false,
+        success: function(response){
+            if(response =="true"){
+                window.open('{{ MEDIA_URL }}reçu_paiement.pdf');
+            }
+        },
+        error: function(request, status, err) {
+            alert((status == "timeout") ? "Timeout" : "error: " + request + status + err);
+        }
+
+    });
+});
 
 $("#montant").on("input", function() {
 let montantpaye=parseFloat($("#montant").val());
